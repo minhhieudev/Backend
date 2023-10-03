@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 
 const Schema = new mongoose.Schema({
-  semester: String,
   schoolYear: String,
-  Point: {
-    selfAssessment: { type: Number, default: 0 },
-    groupAssessment: { type: Number, default: 0 },
-    consultantAssessment: { type: Number, default: 0 },
+  semester: {
+    point: String,
+    classify: String,
+    note: String
   },
   user: { type: mongoose.Types.ObjectId, ref: "user" },
 });

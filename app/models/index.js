@@ -9,8 +9,9 @@ db.answer = require("./answer");
 db.question = require('./question');
 db.training_point = require("./training_point");
 db.result_TrainingPoint = require("./result_TrainingPoint");
-db.detail_TrainingPoint = require("./detail_TrainingPoint");
+db.detailTrainingPoint = require("./detailTrainingPoint");
 db.infor_TrainingPoint = require("./infor_TrainingPoint");
+db.student = require("./student");
 
 
 

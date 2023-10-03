@@ -3,28 +3,61 @@ const app = express();
 const $ = require('../../middlewares/safe-call')
 const modelName = 'user'
 const UserModel = db[modelName];
+const StudentModel = db["student"];
 const bcrypt = require("bcryptjs");
 
-app.post(
-  "/collection",
-  $(async (req, res) => {
-    const { role, ...otherParams } = req.body; // Lấy tham số role từ frontend
+// app.post(
+//   "/collection",
+//   $(async (req, res) => {
+//     const { role, ...otherParams } = req.body; // Lấy tham số role từ frontend
 
-    let filter = {};
+//     let filter = {};
+//     // Kiểm tra nếu có tham số role thì thêm bộ lọc theo vai trò
+//     if (role) {
+//       filter.role = role;
+//     }
 
-    // Kiểm tra nếu có tham số role thì thêm bộ lọc theo vai trò
-    if (role) {
-      filter.role = role;
-    }
+//     const docs = await UserModel.find(filter, "-password").catch((error) => {
+//       console.error("Error: ", error);
+//       return [];
+//     });
 
-    const docs = await UserModel.find(filter, "-password").catch((error) => {
-      console.error("Error: ", error);
-      return [];
+//     return res.json({ success: true, docs });
+//   })
+// );
+app.post("/collection", async (req, res) => {
+  try {
+    // Lấy danh sách người dùng
+    const users = await UserModel.find({}).exec();
+
+    // Lấy danh sách sinh viên dựa trên email
+    const userEmails = users.map(user => user.email);
+    const students = await StudentModel.find({ email: { $in: userEmails } }).exec();
+
+    // Kết hợp thông tin người dùng và sinh viên
+    const docs = users.map(user => {
+      const student = students.find(student => student.email === user.email);
+      return {
+        email: user.email,
+        role: user.role,
+        studentInfo: student || null, // Nếu không tìm thấy sinh viên, có thể trả về null hoặc giá trị mặc định khác
+      };
     });
 
-    return res.json({ success: true, docs });
-  })
-);
+    console.log(docs);
+    return res.json({ success: true,  docs });
+  } catch (error) {
+    console.error("Lỗi: ", error);
+    return res.json({
+      success: false,
+      error: "Không thể lấy thông tin sinh viên cho người dùng.",
+    });
+  }
+});
+
+
+
+
 
 
 app.get("/:id", $(async (req, res) => {

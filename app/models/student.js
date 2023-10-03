@@ -1,14 +1,16 @@
 const mongoose = require("mongoose");
 
-const studentSchema = new mongoose.Schema({
-  MSV: { type: String, required: true, unique: true },
-  hoTen: String,
-  lop: String,
-  khoa: String,
-  // Các trường thông tin khác về sinh viên có thể thêm ở đây
+const Schema = new mongoose.Schema({
+    studentCode: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    fullName: { type: String, required: true },
+    className: { type: String, required: true },
+    department: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true }
 });
 
-// Đặt timestamps để tự động tạo createdAt và updatedAt cho mỗi bản ghi
-studentSchema.set("timestamps", true);
+Schema.set("timestamps", true);
 
-module.exports = mongoose.model("student", studentSchema);
+const student = mongoose.model("student", Schema);
+
+module.exports = student;

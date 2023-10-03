@@ -1,15 +1,50 @@
 const express = require("express");
 const router = express.Router();
 const $ = require("../../middlewares/safe-call");
-const modelName = "detail_TrainingPoint";
+const modelName = "detailTrainingPoint";
 const DetailTrainingPointModel = db[modelName];
 
-// Route để lấy tất cả dữ liệu điểm rèn luyện
 router.get(
   "/",
   $(async (req, res) => {
     try {
-      const detailTrainingPoints = await DetailTrainingPointModel.find();
+      const detailTrainingPoints = await DetailTrainingPointModel.aggregate([
+        {
+          $lookup: {
+            from: "users", // Tên của collection trong MongoDB (users hoặc tên tương ứng)
+            localField: "user",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $unwind: "$userDetails",
+        },
+        {
+          $lookup: {
+            from: "students", // Tên của collection trong MongoDB (students hoặc tên tương ứng)
+            localField: "userDetails.email",
+            foreignField: "email",
+            as: "studentDetails",
+          },
+        },
+        {
+          $unwind: "$studentDetails",
+        },
+        {
+          $project: {
+            _id: 1,
+            criteriaList: 1,
+            semester: 1,
+            schoolYear: 1,
+            Total_selfAssessment: 1,
+            Total_groupAssessment: 1,
+            Total_consultantAssessment: 1,
+            studentDetails: 1, // Thêm thông tin của student vào kết quả
+          },
+        },
+      ]);
+
       return res.json({ success: true, detailTrainingPoints });
     } catch (error) {
       console.error("Error: ", error);
@@ -20,6 +55,9 @@ router.get(
     }
   })
 );
+
+
+
 
 
 
