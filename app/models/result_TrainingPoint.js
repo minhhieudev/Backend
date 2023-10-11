@@ -2,7 +2,17 @@ const mongoose = require("mongoose");
 
 const Schema = new mongoose.Schema({
   schoolYear: String,
-  semester: {
+  semester1: {
+    point: String,
+    classify: String,
+    note: String
+  },
+  semester2: {
+    point: String,
+    classify: String,
+    note: String
+  },
+  wholeYear: {
     point: String,
     classify: String,
     note: String

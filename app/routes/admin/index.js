@@ -23,5 +23,7 @@ app.use('/comment', require('./comment'))
 app.use("/training_point", require("./training_point"));
 app.use("/result_TrainingPoint", require("./result_TrainingPoint"));
 app.use("/detailTrainingPoint", require("./detailTrainingPoint"));
+app.use("/student", require("./student"));
+app.use("/consultant", require("./consultant"));
 
 module.exports = app;

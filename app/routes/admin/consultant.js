@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const $ = require("../../middlewares/safe-call");
-const modelName = "student";
-const StudentModel = db[modelName];
+const modelName = "consultant";
+const ConsultantModel = db[modelName];
 
 
 
@@ -14,9 +14,9 @@ router.get(
       let filter = {};
 
 
-      const students = await StudentModel.find();
+      const consultants = await ConsultantModel.find();
 
-      return res.json({ success: true, students });
+      return res.json({ success: true, consultants });
     } catch (error) {
       console.error("Error: ", error);
       return res.json({
