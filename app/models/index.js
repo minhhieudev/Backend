@@ -12,6 +12,7 @@ db.result_TrainingPoint = require("./result_TrainingPoint");
 db.detailTrainingPoint = require("./detailTrainingPoint");
 db.student = require("./student");
 db.consultant = require("./consultant");
+db.post = require("./post");
 
 
 

@@ -25,5 +25,6 @@ app.use("/result_TrainingPoint", require("./result_TrainingPoint"));
 app.use("/detailTrainingPoint", require("./detailTrainingPoint"));
 app.use("/student", require("./student"));
 app.use("/consultant", require("./consultant"));
+app.use("/post", require("./post"));
 
 module.exports = app;
