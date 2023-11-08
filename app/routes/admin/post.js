@@ -14,6 +14,9 @@ router.get(
   })
 );
 
+
+
+
 router.post(
   "/collection",
   $(async (req, res) => {
@@ -39,7 +42,7 @@ router.get(
       console.error("Error: ", error);
       return res.json({
         success: false,
-        error: "Unable to fetch the list of questions.",
+        error: "Không thể lấy bài đa",
       });
     }
   })

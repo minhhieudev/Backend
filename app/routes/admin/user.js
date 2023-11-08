@@ -4,6 +4,7 @@ const $ = require('../../middlewares/safe-call')
 const modelName = 'user'
 const UserModel = db[modelName];
 const StudentModel = db["student"];
+const ConsultantModel = db["consultant"];
 const bcrypt = require("bcryptjs");
 
 // app.post(
@@ -25,6 +26,7 @@ const bcrypt = require("bcryptjs");
 //     return res.json({ success: true, docs });
 //   })
 // );
+
 app.post("/collection", async (req, res) => {
   try {
     // Lấy danh sách người dùng
@@ -34,26 +36,33 @@ app.post("/collection", async (req, res) => {
     const userEmails = users.map(user => user.email);
     const students = await StudentModel.find({ email: { $in: userEmails } }).exec();
 
-    // Kết hợp thông tin người dùng và sinh viên
+    // Lấy danh sách tư vấn viên dựa trên email
+    const consultants = await ConsultantModel.find({ email: { $in: userEmails } }).exec();
+
+    // Kết hợp thông tin người dùng, sinh viên, và tư vấn viên
     const docs = users.map(user => {
       const student = students.find(student => student.email === user.email);
+      const consultant = consultants.find(consultant => consultant.email === user.email);
       return {
+        _id: user._id,
+        fullname: user.fullname,
         email: user.email,
         role: user.role,
-        studentInfo: student || null, // Nếu không tìm thấy sinh viên, có thể trả về null hoặc giá trị mặc định khác
+        studentInfo: student || null,
+        consultantInfo: consultant || null,
       };
     });
 
-    console.log(docs);
-    return res.json({ success: true,  docs });
+    return res.json({ success: true, docs });
   } catch (error) {
     console.error("Lỗi: ", error);
     return res.json({
       success: false,
-      error: "Không thể lấy thông tin sinh viên cho người dùng.",
+      error: "Không thể lấy thông tin sinh viên và tư vấn viên cho người dùng.",
     });
   }
 });
+
 
 
 
@@ -78,7 +87,6 @@ app.get("/:id", $(async (req, res) => {
 
 app.post("/", $(async (req, res) => {
   const data = req.body
-
   if (data) {
     if (data._id) {
       // update

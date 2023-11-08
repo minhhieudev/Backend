@@ -29,10 +29,9 @@ router.get(
     try {
       let filter = {};
 
-      // Thêm logic để lọc danh sách câu hỏi (nếu cần)
 
       const questions = await QuestionModel.find(filter)
-        .populate({ path: "user", select: "fullname" }) // Lấy thông tin người tạo câu hỏi
+        .populate({ path: "user", select: "fullname" }) 
 
       return res.json({ success: true, questions });
     } catch (error) {
@@ -50,7 +49,6 @@ router.get(
   "/:id",
   $(async (req, res) => {
     try {
-      // Lấy chi tiết câu hỏi dựa trên ID và sử dụng populate để lấy danh sách câu trả lời
       const questionId = req.params.id;
       const question = await QuestionModel.findById(questionId)
         .populate({ path: "user", select: "fullname" })

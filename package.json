@@ -17,6 +17,7 @@
     "author": "WineLux",
     "license": "ISC",
     "dependencies": {
+        "bcrypt": "^5.1.1",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
         "cors": "^2.8.5",
@@ -25,11 +26,13 @@
         "express-validator": "^6.14.2",
         "html-to-text": "^8.2.1",
         "html-word-count": "^1.0.0",
+        "iconv-lite": "^0.6.3",
         "jsonwebtoken": "^8.5.1",
         "mongoose": "^6.5.2",
         "mongoose-paginate-v2": "^1.7.1",
         "morgan": "^1.10.0",
-        "multer": "^1.4.5-lts.1"
+        "multer": "^1.4.5-lts.1",
+        "transliterate": "^1.0.1"
     },
     "devDependencies": {
         "axios": "^0.27.2",

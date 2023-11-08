@@ -14,7 +14,7 @@ app.use('/auth', require('./auth'));
 app.use('/file', require('./file'));
 
 app.use(authJwt.verifyRoleAdmin);
-app.use('/users', require('./user'));
+app.use('/user', require('./user'));
 app.use('/helper', require('./helper'))
 app.use('/setting', require('./setting'))
 app.use("/question", require("./question"));
