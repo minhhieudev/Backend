@@ -85,6 +85,7 @@ router.post(
           // Nếu tạo mới câu hỏi thành công, trả về thông tin câu hỏi vừa tạo
           return res.json({
             success: true,
+            status: 'success',
             question: createdQuestion,
             message: "Tạo mới câu hỏi thành công.",
           });
@@ -103,6 +104,23 @@ router.post(
     } catch (error) {
       console.error("Error: ", error);
       return res.json({ success: false, error: "Không thể tạo mới câu hỏi." });
+    }
+  })
+);
+
+router.post(
+  "/status/:id",
+  $(async (req, res) => {
+    try {
+      const questionId = req.params.id;
+
+      // Cập nhật trạng thái của câu hỏi có ID tương ứng mà không cần truy vấn câu hỏi trước đó
+      await QuestionModel.updateOne({ _id: questionId }, { $set: { status: true } });
+
+      res.json({ success: true});
+    } catch (error) {
+      console.error("Error updating status: ", error);
+      res.json({ success: false, error: "Error updating status." });
     }
   })
 );

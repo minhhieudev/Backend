@@ -4,6 +4,7 @@ const detailTrainingPointSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
   semester: String,
   schoolYear: String,
+  status: { type: Boolean, default: false },
   criteriaList: [
     {
       stt: String,

@@ -8,6 +8,7 @@ const postSchema = new mongoose.Schema({
     filename: { type: String },
     path: { type: String }
   }],
+  postType: { type: String },
   createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 }, // Đặt kiểu dữ liệu là số nguyên
   privacy: { type: String, enum: ["public", "private"], default: "public" }, // Công khai hoặc riêng tư

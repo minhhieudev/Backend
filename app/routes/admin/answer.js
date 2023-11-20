@@ -74,6 +74,7 @@ router.post(
           // Nếu tạo mới câu trả lời thành công, trả về thông tin câu trả lời vừa tạo
           return res.json({
             success: true,
+            status: 'success',
             answer: createdAnswer,
             message: "Tạo mới câu trả lời thành công.",
           });

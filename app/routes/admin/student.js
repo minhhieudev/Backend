@@ -28,6 +28,47 @@ router.get(
   })
 );
 
+router.get("/class-list", async (req, res) => {
+  try {
+    const classLists = await StudentModel.distinct("className");
+
+    return res.json({ success: true, classLists });
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.json({
+      success: false,
+      error: "Không thể lấy danh sách lớp học.",
+    });
+  }
+});
+router.get("/khoaList", async (req, res) => {
+  try {
+    const khoaLists = await StudentModel.distinct("department");
+
+    return res.json({ success: true, khoaLists });
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.json({
+      success: false,
+      error: "Không thể lấy danh sách khoa.",
+    });
+  }
+});
+
+router.get("/nganhList", async (req, res) => {
+  try {
+    const nganhLists = await StudentModel.distinct("majors");
+
+    return res.json({ success: true, nganhLists });
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.json({
+      success: false,
+      error: "Không thể lấy danh sách nganh.",
+    });
+  }
+});
+
 router.get(
   "/get-fullName/:email",
   $(async (req, res) => {
@@ -65,6 +106,8 @@ router.get(
 
 
 router.get("/:id", $(async (req, res) => {
+  console.error('gfasdgsdgd');
+
   const id = req.params.id;
   if (id) {
     const doc = await StudentModel.findOne({ _id: id }).catch(error => {
@@ -81,6 +124,10 @@ router.get("/:id", $(async (req, res) => {
     return res.json({ success: false, doc: null });
   }
 }))
+
+
+
+
 
 
 // router.post(
