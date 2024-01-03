@@ -154,6 +154,37 @@ router.get(
   }
 );
 
+router.get("/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Thực hiện truy vấn findOne để lấy điểm kỳ 1 tương ứng với userId và schoolYear
+    const trainingPointStudent = await ResultTrainingPointModel.find(
+      { user: userId },
+      // Projection: chỉ lấy các trường mong muốn, 0 là để loại bỏ
+      { _id: 0,user:0,createdAt: 0,updatedAt:0}
+    );
+
+    // Kiểm tra nếu không có dữ liệu
+    if (!trainingPointStudent) {
+      return res.json({
+        success: false,
+        error: "Không tìm thấy điểm rèn luyện cho sinh viên.",
+      });
+    }
+
+    // Trả về dữ liệu kỳ 1 nếu tìm thấy
+    return res.json({ success: true, trainingPointStudent });
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.json({
+      success: false,
+      error: "Không thể lấy điểm rèn luyện.",
+    });
+  }
+});
+
+
 router.post(
   "/",
   $(async (req, res) => {

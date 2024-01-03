@@ -41,6 +41,7 @@ router.get("/class-list", async (req, res) => {
     });
   }
 });
+
 router.get("/khoaList", async (req, res) => {
   try {
     const khoaLists = await StudentModel.distinct("department");
@@ -106,7 +107,6 @@ router.get(
 
 
 router.get("/:id", $(async (req, res) => {
-  console.error('gfasdgsdgd');
 
   const id = req.params.id;
   if (id) {
