@@ -9,9 +9,12 @@ const postSchema = new mongoose.Schema({
     path: { type: String }
   }],
   postType: { type: String },
+  comments: { type: Number, default: 0 }, 
+  answers: [{ type: mongoose.Types.ObjectId, ref: "answer" }],
+  pinned: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
-  likes: { type: Number, default: 0 }, // Đặt kiểu dữ liệu là số nguyên
-  privacy: { type: String, enum: ["public", "private"], default: "public" }, // Công khai hoặc riêng tư
+  likes: { type: Number, default: 0 }, 
+  privacy: { type: String, enum: ["public", "private"], default: "public" }, 
 }, { timestamps: true });
 
 module.exports = mongoose.model("post", postSchema);

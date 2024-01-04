@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
   photoURL: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 }, // Đặt kiểu dữ liệu là số nguyên
-  comments: { type: Number, default: 0 }, // Đặt kiểu dữ liệu là số nguyên
+  comments: { type: Number, default: 0 }, 
   answers: [{ type: mongoose.Types.ObjectId, ref: "answer" }],
   status: { type: Boolean, default: false },
   privacy: { type: String, enum: ["public", "private"], default: "public" }, // Công khai hoặc riêng tư

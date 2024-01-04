@@ -9,7 +9,7 @@ const PostModel = db[modelName];
 router.get(
   "/status-list",
   $(async (req, res) => {
-     const doc = "X";; // Ensure that STATUS_LABEL is defined in QuestionModel
+    const doc = "X";; // Ensure that STATUS_LABEL is defined in QuestionModel
     return res.json({ success: true, doc });
   })
 );
@@ -109,64 +109,103 @@ router.post(
   })
 );
 
-router.post(
-  "/:id",
-  $(async (req, res) => {
-    try {
-      const questionId = req.params.id;
+// router.post(
+//   "/:id",
+//   $(async (req, res) => {
+//     try {
+//       const questionId = req.params.id;
 
-      // Cập nhật giá trị likes cho câu hỏi dựa trên ID
-const updatedQuestion = await PostModel.findOneAndUpdate(
-  { _id: questionId },
-  { $inc: { likes: 1 } },
-  { new: true }
-);
+//       // Cập nhật giá trị likes cho câu hỏi dựa trên ID
+// const updatedQuestion = await PostModel.findOneAndUpdate(
+//   { _id: questionId },
+//   { $inc: { likes: 1 } },
+//   { new: true }
+// );
 
 
-      if (!updatedQuestion) {
-        return res
-          .status(404)
-          .json({ success: false, error: "Câu hỏi không tồn tại." });
-      }
+//       if (!updatedQuestion) {
+//         return res
+//           .status(404)
+//           .json({ success: false, error: "Câu hỏi không tồn tại." });
+//       }
 
-      res.json(updatedQuestion); // Gửi lại tài liệu đã cập nhật cho người dùng
-    } catch (err) {
-      console.error(err); // In ra lỗi
-      res.status(500).json(err); // Gửi lại lỗi cho người dùng
-    }
-  })
-);
+//       res.json(updatedQuestion); // Gửi lại tài liệu đã cập nhật cho người dùng
+//     } catch (err) {
+//       console.error(err); // In ra lỗi
+//       res.status(500).json(err); // Gửi lại lỗi cho người dùng
+//     }
+//   })
+// );
 router.post(
   "/:id/count",
   $(async (req, res) => {
     try {
-      const questionId = req.params.id;
-      const answersCount = req.body.answersCount; 
+      const postId = req.params.id;
+      const postsCount = req.body.answersCount;
 
-      // Cập nhật giá trị comments cho câu hỏi dựa trên ID và giá trị answersCount
-      const updatedQuestion = await PostModel.findOneAndUpdate(
-        { _id: questionId },
-        { $set: { comments: answersCount } }, // Sử dụng $set để cập nhật giá trị comments
+      const updatedPost = await PostModel.findOneAndUpdate(
+        { _id: postId },
+        { $set: { comments: postsCount } },
         { new: true }
       );
 
-
-      if (!updatedQuestion) {
+      if (!updatedPost) {
         return res
           .status(404)
           .json({ success: false, error: "Câu hỏi không tồn tại." });
       }
 
-      res.json(updatedQuestion); // Gửi lại tài liệu đã cập nhật cho người dùng
+      res.json(updatedPost);
     } catch (err) {
-      console.error(err); // In ra lỗi
-      res.status(500).json(err); // Gửi lại lỗi cho người dùng
+      console.error(err);
+      res.status(500).json(err);
+    }
+  })
+);
+router.post(
+  "/like/:id",
+  $(async (req, res) => {
+    try {
+      const postId = req.params.id;
+
+      const updatedPost = await PostModel.findOneAndUpdate(
+        { _id: postId },
+        { $inc: { likes: 1 } },
+        { new: true }
+      );
+
+      if (!updatedPost) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Câu hỏi không tồn tại." });
+      }
+      res.json(updatedPost); 
+    } catch (err) {
+      console.error(err);
+      res.status(500).json(err);
     }
   })
 );
 
 
+router.post('/updatePinnedStatus/:id', async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const { pinned } = req.body;
 
+    // Cập nhật trạng thái pinned của bài đăng
+    const updatedPost = await PostModel.findByIdAndUpdate(postId, { pinned }, { new: true });
+
+    if (!updatedPost) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy bài đăng.' });
+    }
+
+    return res.json({ success: true, post: updatedPost });
+  } catch (error) {
+    console.error('Lỗi khi cập nhật trạng thái pinned:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
+  }
+});
 
 router.delete(
   "/:id",

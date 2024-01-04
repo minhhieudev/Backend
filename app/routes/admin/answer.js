@@ -8,7 +8,7 @@ const AnswerModel = db[modelName];
 router.get(
   "/status-list",
   $(async (req, res) => {
-     const doc = "X"; // Đảm bảo rằng STATUS_LABEL được định nghĩa trong AnswerModel
+    const doc = "X"; // Đảm bảo rằng STATUS_LABEL được định nghĩa trong AnswerModel
     return res.json({ success: true, doc });
   })
 );
@@ -66,17 +66,13 @@ router.post(
       const data = req.body;
 
       if (data) {
-        // TODO: Thêm các bước kiểm tra và xác thực dữ liệu đầu vào nếu cần
-
         const createdAnswer = await AnswerModel.create(data);
 
         if (createdAnswer) {
-          // Nếu tạo mới câu trả lời thành công, trả về thông tin câu trả lời vừa tạo
           return res.json({
             success: true,
             status: 'success',
             answer: createdAnswer,
-            message: "Tạo mới câu trả lời thành công.",
           });
         } else {
           return res.json({
