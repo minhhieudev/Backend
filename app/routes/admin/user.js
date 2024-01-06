@@ -28,6 +28,7 @@ const bcrypt = require("bcryptjs");
 // );
 
 app.post("/collection", async (req, res) => {
+
   try {
     // Lấy danh sách người dùng
     const users = await UserModel.find({}).exec();
@@ -48,6 +49,7 @@ app.post("/collection", async (req, res) => {
         fullname: user.fullname,
         email: user.email,
         role: user.role,
+        avatarUrl: user.avatarUrl,
         studentInfo: student || null,
         consultantInfo: consultant || null,
       };
@@ -70,6 +72,7 @@ app.post("/collection", async (req, res) => {
 
 
 app.get("/:id", $(async (req, res) => {
+
   const id = req.params.id
   if (id) {
     const doc = await UserModel.findOne({ _id: id }).catch(error => {
@@ -121,6 +124,7 @@ app.post("/", $(async (req, res) => {
 }))
 
 app.delete("/:id", $(async (req, res) => {
+
   const id = req.params.id
   if (id) {
     const result = await UserModel.deleteOne({ _id: id }).catch(error => {
@@ -135,5 +139,30 @@ app.delete("/:id", $(async (req, res) => {
 
   return res.json({ success: false })
 }))
+
+
+app.post('/updateAvatarUser/:id', async (req, res) => {
+
+  try {
+    const userId = req.params.id;
+    const newUrl = req.body.avatarUrl.newUrl; // Truy xuất giá trị avatarUrl trực tiếp từ client
+
+    // Kết hợp newUrl với /upload/
+
+    console.log(newUrl);
+
+    // Cập nhật avatarUrl trong MongoDB
+    const avatarUrl = await UserModel.findByIdAndUpdate(userId, { avatarUrl: newUrl }, { new: true });
+
+    if (!avatarUrl) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy user.' });
+    }
+
+    return res.json({ success: true, user: avatarUrl });
+  } catch (error) {
+    console.error('Lỗi khi cập nhật avatar:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
+  }
+});
 
 module.exports = app;

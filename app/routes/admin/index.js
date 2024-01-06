@@ -19,6 +19,7 @@ app.use('/helper', require('./helper'))
 app.use('/setting', require('./setting'))
 app.use("/question", require("./question"));
 app.use("/answer", require("./answer"));
+app.use("/reply", require("./reply"));
 app.use('/comment', require('./comment'))
 app.use("/training_point", require("./training_point"));
 app.use("/result_TrainingPoint", require("./result_TrainingPoint"));

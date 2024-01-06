@@ -26,51 +26,51 @@ router.post(
   })
 );
 
-router.get(
-  "/",
-  $(async (req, res) => {
-    try {
-      let filter = {};
+router.get("/", async (req, res) => {
+  try {
+    let filter = {};
 
-      // Add logic to filter the list of questions (if needed)
-
-      const posts = await PostModel.find(filter)
-        .populate({ path: "user", select: "fullname" });
-
-      return res.json({ success: true, posts });
-    } catch (error) {
-      console.error("Error: ", error);
-      return res.json({
-        success: false,
-        error: "Không thể lấy bài đa",
+    const posts = await PostModel.find(filter)
+      .populate({
+        path: "user",
+        select: "fullname avatarUrl",
       });
+
+    return res.json({ success: true, posts });
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.json({
+      success: false,
+      error: "Không thể lấy bài đăng",
+    });
+  }
+});
+
+
+router.get("/:id", async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const post = await PostModel.findById(postId)
+      .populate({
+        path: "user",
+        select: "fullname avatarUrl",
+      })
+      .populate({ path: "answers", select: "content" });
+
+    if (!post) {
+      return res.json({ success: false, error: "Post not found." });
     }
-  })
-);
 
-router.get(
-  "/:id",
-  $(async (req, res) => {
-    try {
-      const questionId = req.params.id;
-      const question = await PostModel.findById(questionId)
-        .populate({ path: "user", select: "fullname" })
-        .populate({ path: "answers", select: "content" });
+    return res.json({ success: true, post });
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.json({
+      success: false,
+      error: "Unable to fetch the details of the post.",
+    });
+  }
+});
 
-      if (!question) {
-        return res.json({ success: false, error: "Question not found." });
-      }
-
-      return res.json({ success: true, question });
-    } catch (error) {
-      console.error("Error: ", error);
-      return res.json({
-        success: false,
-        error: "Unable to fetch the details of the question.",
-      });
-    }
-  })
-);
 
 router.post(
   "/",
@@ -87,12 +87,14 @@ router.post(
           // Nếu tạo mới câu hỏi thành công, trả về thông tin câu hỏi vừa tạo
           return res.json({
             success: true,
+            status: 'success',
             post: createdPost,
             message: "Tạo mới bài đăng.",
           });
         } else {
           return res.json({
             success: false,
+            status: 'error',
             error: "Không thể tạo mới bài đăng.",
           });
         }
@@ -179,7 +181,7 @@ router.post(
           .status(404)
           .json({ success: false, error: "Câu hỏi không tồn tại." });
       }
-      res.json(updatedPost); 
+      res.json(updatedPost);
     } catch (err) {
       console.error(err);
       res.status(500).json(err);

@@ -31,7 +31,10 @@ router.get(
 
 
       const questions = await QuestionModel.find(filter)
-        .populate({ path: "user", select: "fullname" })
+        .populate({
+          path: "user",
+          select: "fullname avatarUrl",
+        });
 
       return res.json({ success: true, questions });
     } catch (error) {
@@ -51,7 +54,10 @@ router.get(
     try {
       const questionId = req.params.id;
       const question = await QuestionModel.findById(questionId)
-        .populate({ path: "user", select: "fullname" })
+        .populate({
+          path: "user",
+          select: "fullname avatarUrl",
+        })
         .populate({ path: "answers", select: "content" });
 
       if (!question) {

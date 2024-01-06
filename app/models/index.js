@@ -6,6 +6,7 @@ db.setting = require('./setting');
 db.comment = require('./Comment');
 
 db.answer = require("./answer");
+db.reply = require("./reply");
 db.question = require('./question');
 db.training_point = require("./training_point");
 db.result_TrainingPoint = require("./result_TrainingPoint");

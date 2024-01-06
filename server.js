@@ -49,7 +49,7 @@ global.db = db
 global.APP_DIR = __dirname
 
 app.use(cors(corsOptions));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // connect to mongo

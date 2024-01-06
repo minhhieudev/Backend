@@ -1,17 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const $ = require("../../middlewares/safe-call");
-const modelName = "answer";
-const AnswerModel = db[modelName];
+const modelName = "reply";
+const ReplyModel = db[modelName];
 
-// Custom routes
-router.get(
-  "/status-list",
-  $(async (req, res) => {
-    const doc = "X"; // Đảm bảo rằng STATUS_LABEL được định nghĩa trong AnswerModel
-    return res.json({ success: true, doc });
-  })
-);
 
 // CRUD routes
 router.post(
@@ -26,12 +18,11 @@ router.get(
   "/",
   $(async (req, res) => {
     try {
-      // Thêm logic xử lý yêu cầu lấy danh sách câu trả lời ở đây
-      const answers = await AnswerModel.find({}).populate({
+      const reply = await ReplyModel.find({}).populate({
         path: "user",
         select: "fullname avatarUrl",
       });
-      return res.json({ success: true, answers });
+      return res.json({ success: true, reply });
     } catch (error) {
       console.error("Error: ", error);
       return res.json({
@@ -45,14 +36,14 @@ router.get(
   "/:id",
   $(async (req, res) => {
     try {
-      const questionId = req.params.id;
-      const answers = await AnswerModel.find({ question: questionId })
-        .populate("question")
+      const replyId = req.params.id;
+      const reply = await ReplyModel.find({ reply: replyId })
+        .populate("post")
         .populate({
           path: "user",
           select: "fullname avatarUrl",
         });
-      return res.json({ success: true, answers });
+      return res.json({ success: true, reply });
     } catch (error) {
       console.error("Error: ", error);
       return res.json({
@@ -71,13 +62,12 @@ router.post(
       const data = req.body;
 
       if (data) {
-        const createdAnswer = await AnswerModel.create(data);
+        const createdReply = await ReplyModel.create(data);
 
-        if (createdAnswer) {
+        if (createdReply) {
           return res.json({
             success: true,
             status: 'success',
-            answer: createdAnswer,
           });
         } else {
           return res.json({
