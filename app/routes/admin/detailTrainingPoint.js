@@ -176,7 +176,7 @@ router.post(
           return res.status(201).json({
             success: true,
             status: 'success',
-            message: "Lưu điểm thành công.",
+            message: "Nộp phiếu điểm hành công.",
           });
         }
       }

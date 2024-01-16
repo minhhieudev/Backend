@@ -4,21 +4,22 @@ const schema = new mongoose.Schema({
 
   criteriaList: [
     {
-      stt: String, // Số thứ tự
-      criteria: String, // Tiêu đề
+      stt: String,
+      criteria: {
+        text: String,
+        selfAssessment: Number,
+        groupAssessment: Number,
+        consultantAssessment: Number,
+      },
       content: [
         {
           text: String,
-          maxScore:Number,
-          selfAssessment: Number,
-          groupAssessment: Number,
-          consultantAssessment: Number,
+          maxScore: Number,
         }
       ],
-     
     },
   ],
-  
+
 });
 
 schema.set("timestamps", true);

@@ -8,15 +8,17 @@ const detailTrainingPointNhapSchema = new mongoose.Schema({
   criteriaList: [
     {
       stt: String,
-      criteria: String, 
+      criteria: {
+        text: String,
+        selfAssessment: Number,
+        groupAssessment: Number,
+        consultantAssessment: Number,
+      },
       content: [
         {
           text: String,
           maxScore: Number,
-          selfAssessment: Number,
-          groupAssessment: Number,
-          consultantAssessment: Number,
-        },
+        }
       ],
     },
   ],
