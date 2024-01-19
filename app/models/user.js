@@ -3,9 +3,22 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   fullname: { type: String },
   email: { type: String, required: true },
-  avatarUrl: { type: String, default: 'uploads/avatar.png' },
+  avatarUrl: { type: String, default: 'http://localhost:8001/uploads/avatar.png' },
   password: { type: String, required: true },
   role: { type: String, default: 'student' },
+  notifications: [
+    {
+      user: {
+        _id: String,
+        fullname: String,
+        avatarUrl: String,
+      },
+      content: String,
+      createdAt: { type: Date, default: Date.now },
+      viewed: { type: Boolean, default: false },
+
+    }
+  ]
 });
 
 // Virtual populate để liên kết với mô hình student qua trường email

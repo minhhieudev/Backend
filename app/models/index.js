@@ -15,6 +15,7 @@ db.detailTrainingPointNhap = require("./detailTrainingPointNhap");
 db.student = require("./student");
 db.consultant = require("./consultant");
 db.post = require("./post");
+db.notification = require("./notification");
 
 
 

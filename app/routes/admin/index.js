@@ -28,5 +28,6 @@ app.use("/detailTrainingPointNhap", require("./detailTrainingPointNhap"));
 app.use("/student", require("./student"));
 app.use("/consultant", require("./consultant"));
 app.use("/post", require("./post"));
+app.use("/notification", require("./notification"));
 
 module.exports = app;

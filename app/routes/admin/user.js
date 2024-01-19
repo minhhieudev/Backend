@@ -65,12 +65,6 @@ app.post("/collection", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
 app.get("/:id", $(async (req, res) => {
 
   const id = req.params.id
@@ -149,8 +143,6 @@ app.post('/updateAvatarUser/:id', async (req, res) => {
 
     // Kết hợp newUrl với /upload/
 
-    console.log(newUrl);
-
     // Cập nhật avatarUrl trong MongoDB
     const avatarUrl = await UserModel.findByIdAndUpdate(userId, { avatarUrl: newUrl }, { new: true });
 
@@ -164,5 +156,77 @@ app.post('/updateAvatarUser/:id', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
   }
 });
+
+app.post('/updateNotificationForUser/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const notificationList = req.body.notifications;
+
+    // Kiểm tra nếu notificationList không phải là một mảng thì trả về lỗi
+    if (!Array.isArray(notificationList)) {
+      return res.status(400).json({ success: false, message: 'Danh sách thông báo không hợp lệ.' });
+    }
+
+    // Cập nhật mảng notifications của người dùng
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      { $push: { notifications: { $each: notificationList } } },
+      { new: true, select: 'notifications' }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng.' });
+    }
+
+    return res.json({ success: true, latestNotification: updatedUser.notifications });
+  } catch (error) {
+    console.error('Lỗi khi cập nhật notifications:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
+  }
+});
+app.get("/getNotification/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Lấy thông báo của người dùng cụ thể
+    const user = await UserModel.findById(userId).select('notifications');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng.' });
+    }
+
+    return res.json({ success: true, notifications: user.notifications });
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.status(500).json({
+      success: false,
+      error: "Không thể lấy thông báo.",
+    });
+  }
+});
+
+app.post('/addNotification/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const newNotification = req.body.notification;
+
+    // Cập nhật mảng notifications của người dùng
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      { $push: { notifications: newNotification } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng.' });
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Lỗi khi thêm thông báo:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
+  }
+});
+
 
 module.exports = app;
