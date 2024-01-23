@@ -208,4 +208,52 @@ router.delete(
   })
 );
 
+
+router.post(
+  "/updateQuestion/:id",
+  $(async (req, res) => {
+    try {
+      const questionId = req.params.id;
+      const updatedData = req.body.newQuestion; // Updated question data
+
+      // Ensure that the required fields are provided
+      if (!updatedData || !updatedData.title || !updatedData.content) {
+        return res.status(400).json({
+          success: false,
+          error: "Vui lòng cung cấp đầy đủ dữ liệu câu hỏi cần cập nhật.",
+        });
+      }
+
+      // Update the question using findOneAndUpdate
+      const updatedQuestion = await QuestionModel.findOneAndUpdate(
+        { _id: questionId },
+        { $set: updatedData },
+        { new: true }
+      );
+
+      // Check if the question was updated successfully
+      if (!updatedQuestion) {
+        return res.status(404).json({
+          success: false,
+          error: "Câu hỏi không tồn tại hoặc không thể cập nhật.",
+        });
+      }
+
+      // Return the updated question
+      res.json({
+        success: true,
+        status: 'success',
+        message: "Cập nhật câu hỏi thành công.",
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        success: false,
+        error: "Lỗi khi cập nhật câu hỏi.",
+      });
+    }
+  })
+);
+
+
 module.exports = router;

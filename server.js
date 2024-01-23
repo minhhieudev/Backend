@@ -6,6 +6,32 @@ const cors = require("cors");
 const app = express();
 const logger = require('morgan');
 
+const http = require("http");
+const socketIo = require("socket.io");
+const server = http.createServer(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: '*', // Thay đổi địa chỉ của ứng dụng Vue.js của bạn
+    methods: ['GET', 'POST'],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("Client connected");
+
+  // Lắng nghe sự kiện khi có thông báo mới được tạo
+  socket.on("newNotification", async () => {
+    
+
+    io.emit("updateNotifications");
+  });
+
+  // Ngắt kết nối
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -34,9 +60,9 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
 
 
 
-var corsOptions = {
-    origin: '*',
-    optionsSuccessStatus: 200
+const corsOptions = {
+  origin: 'http://localhost:8081', // Thay đổi địa chỉ của ứng dụng Vue.js của bạn
+  optionsSuccessStatus: 200,
 };
 
 require('dotenv').config()
@@ -94,7 +120,7 @@ async function init() {
   }
 }
 
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   init()
   console.log(`Server is running on port ${PORT}.`);
 });

@@ -88,7 +88,6 @@ router.post(
           return res.json({
             success: true,
             status: 'success',
-            post: createdPost,
             message: "Tạo mới bài đăng.",
           });
         } else {

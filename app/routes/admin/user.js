@@ -161,6 +161,7 @@ app.post('/updateNotificationForUser/:id', async (req, res) => {
   try {
     const userId = req.params.id;
     const notificationList = req.body.notifications;
+    
 
     // Kiểm tra nếu notificationList không phải là một mảng thì trả về lỗi
     if (!Array.isArray(notificationList)) {
@@ -170,15 +171,14 @@ app.post('/updateNotificationForUser/:id', async (req, res) => {
     // Cập nhật mảng notifications của người dùng
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
-      { $push: { notifications: { $each: notificationList } } },
-      { new: true, select: 'notifications' }
+      { notifications:  notificationList},
     );
 
     if (!updatedUser) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng.' });
     }
 
-    return res.json({ success: true, latestNotification: updatedUser.notifications });
+    return res.json({ success: true });
   } catch (error) {
     console.error('Lỗi khi cập nhật notifications:', error);
     return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
@@ -208,6 +208,8 @@ app.get("/getNotification/:id", async (req, res) => {
 app.post('/addNotification/:id', async (req, res) => {
   try {
     const userId = req.params.id;
+console.log(userId)
+
     const newNotification = req.body.notification;
 
     // Cập nhật mảng notifications của người dùng
@@ -228,5 +230,26 @@ app.post('/addNotification/:id', async (req, res) => {
   }
 });
 
+// Cập nhật trạng thái đã xem cho tất cả thông báo của người dùng
+app.post("/updateNotificationStatus/:id", async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
 
+    // Cập nhật trạng thái đã xem cho tất cả thông báo
+    user.notifications.forEach((notification) => {
+      notification.viewed = true;
+    });
+
+    // Lưu người dùng đã được cập nhật
+    await user.save();
+
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+});
 module.exports = app;
