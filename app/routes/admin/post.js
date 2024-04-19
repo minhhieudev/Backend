@@ -233,4 +233,46 @@ router.delete(
   })
 );
 
+router.post(
+  "/updatePost/:id",
+  $(async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const updatedData = req.body.newPost; 
+
+      if (!updatedData || !updatedData.title || !updatedData.content) {
+        return res.status(400).json({
+          success: false,
+          error: "Vui lòng cung cấp đầy đủ dữ liệu bài đăng cần cập nhật.",
+        });
+      }
+
+      const updatedPost = await PostModel.findOneAndUpdate(
+        { _id: postId },
+        { $set: updatedData },
+        { new: true }
+      );
+
+      if (!updatedPost) {
+        return res.status(404).json({
+          success: false,
+          error: "Bài đăng không tồn tại hoặc không thể cập nhật.",
+        });
+      }
+
+      res.json({
+        success: true,
+        status: 'success',
+        message: "Cập nhật bài đăng thành công.",
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        success: false,
+        error: "Lỗi khi cập nhật bài đăng.",
+      });
+    }
+  })
+);
+
 module.exports = router;

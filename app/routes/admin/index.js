@@ -29,5 +29,6 @@ app.use("/student", require("./student"));
 app.use("/consultant", require("./consultant"));
 app.use("/post", require("./post"));
 app.use("/notification", require("./notification"));
+app.use("/search", require("./search"));
 
 module.exports = app;

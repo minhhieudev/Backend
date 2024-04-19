@@ -77,8 +77,6 @@ router.post(
   "/update/:userId/:schoolYear",
   $(async (req, res) => {
     try {
-      // In ra dữ liệu nhận được từ request
-      console.log("Request data: ", req.body);
 
       const { semester2Data, wholeYear } = req.body;
 

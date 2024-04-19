@@ -38,16 +38,16 @@ router.get(
             criteriaList: 1,
             semester: 1,
             schoolYear: 1,
-            status:1,
+            status: 1,
             Total_selfAssessment: 1,
             Total_groupAssessment: 1,
             Total_consultantAssessment: 1,
             studentDetails: 1,
-            createdAt:1
+            createdAt: 1
           },
         },
       ]);
-console.log(detailTrainingPoints)
+      console.log(detailTrainingPoints)
       return res.json({ success: true, detailTrainingPoints });
     } catch (error) {
       console.error("Error: ", error);
@@ -59,17 +59,20 @@ console.log(detailTrainingPoints)
   })
 );
 
-// Update status
 router.post(
   "/status/:id",
   $(async (req, res) => {
     try {
       const postId = req.params.id;
+      const result = req.body.result; // Lấy giá trị result từ request body
 
-      // Cập nhật trạng thái của câu hỏi có ID tương ứng mà không cần truy vấn câu hỏi trước đó
-      await DetailTrainingPointModel.updateOne({ _id: postId }, { $set: { status: true } });
+      // Cập nhật trạng thái và Total_consultantAssessment của câu hỏi có ID tương ứng
+      await DetailTrainingPointModel.updateOne(
+        { _id: postId },
+        { $set: { status: true, Total_consultantAssessment: result } }
+      );
 
-      res.json({   success: true,  status: 'success', message: 'Duyệt thành công.' });
+      res.json({ success: true, status: 'success', message: 'Duyệt thành công.' });
     } catch (error) {
       console.error("Error updating status: ", error);
       res.json({ success: false, error: "Error updating status." });
@@ -77,11 +80,12 @@ router.post(
   })
 );
 
+
 // Lấy chi tiết điểm rèn luyện theo ID
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    
+
     if (!id) {
       return res.status(400).json({ success: false, error: "Missing ID parameter" });
     }
@@ -121,12 +125,12 @@ router.get("/:id", async (req, res) => {
             criteriaList: 1,
             semester: 1,
             schoolYear: 1,
-            status:1,
+            status: 1,
             Total_selfAssessment: 1,
             Total_groupAssessment: 1,
             Total_consultantAssessment: 1,
             studentDetails: 1,
-            createdAt:1,
+            createdAt: 1,
           },
         },
       ]);
