@@ -80,7 +80,6 @@ router.post(
 );
 
 
-// Lấy chi tiết điểm rèn luyện theo ID
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -130,6 +129,8 @@ router.get("/:id", async (req, res) => {
             Total_consultantAssessment: 1,
             studentDetails: 1,
             createdAt: 1,
+            // Bao gồm thêm userDetails._id
+            "userDetails._id": 1, // Trả về _id của user
           },
         },
       ]);
