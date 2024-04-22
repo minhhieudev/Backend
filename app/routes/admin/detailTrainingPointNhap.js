@@ -103,7 +103,7 @@ router.post(
           return res.status(201).json({
             success: true,
             status: 'success',
-            message: "Lưu điểm thành công copy.",
+            message: "Đã lưu nháp bảng điểm.",
           });
         }
       }
@@ -132,7 +132,6 @@ router.delete(
         return res.json({
           success: true,
           status: "success",
-          message: "Xóa hoàn tất.",
         });
       }
     }

@@ -47,7 +47,6 @@ router.get(
           },
         },
       ]);
-      console.log(detailTrainingPoints)
       return res.json({ success: true, detailTrainingPoints });
     } catch (error) {
       console.error("Error: ", error);

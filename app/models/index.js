@@ -1,9 +1,7 @@
 const db = {};
 
 db.user = require("./user");
-db.file = require('./file');
 db.setting = require('./setting');
-db.comment = require('./Comment');
 
 db.answer = require("./answer");
 db.reply = require("./reply");

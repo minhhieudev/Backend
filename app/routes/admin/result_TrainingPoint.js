@@ -188,6 +188,7 @@ router.post(
   $(async (req, res) => {
     try {
       const data = req.body;
+      console.log(data)
 
       if (data) {
         // TODO: Thêm các bước kiểm tra và xác thực dữ liệu đầu vào nếu cần
@@ -199,7 +200,7 @@ router.post(
           return res.json({
             success: true,
             resultTrainingPoint: createdResultTrainingPointModel,
-            message: "Lưu điểm thành công.",
+            //message: "Lưu điểm thành công.",
           });
         }
       }

@@ -11,7 +11,6 @@ app.use(function(req, res, next) {
 });
 
 app.use('/auth', require('./auth'));
-app.use('/file', require('./file'));
 
 app.use(authJwt.verifyRoleAdmin);
 app.use('/user', require('./user'));
@@ -20,7 +19,6 @@ app.use('/setting', require('./setting'))
 app.use("/question", require("./question"));
 app.use("/answer", require("./answer"));
 app.use("/reply", require("./reply"));
-app.use('/comment', require('./comment'))
 app.use("/training_point", require("./training_point"));
 app.use("/result_TrainingPoint", require("./result_TrainingPoint"));
 app.use("/detailTrainingPoint", require("./detailTrainingPoint"));
