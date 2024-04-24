@@ -61,7 +61,7 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
 
 
 const corsOptions = {
-  origin: 'http://localhost:8081', // Thay đổi địa chỉ của ứng dụng Vue.js của bạn
+  origin: 'http://localhost:8081', 
   optionsSuccessStatus: 200,
 };
 
@@ -81,7 +81,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // connect to mongo
 // let monoPath = `mongodb+srv://kimtrongdev2:HUYyfu1ovSqkxJde@cluster0.vawtbzy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 if (process.env.MONGO_URL) {
-  monoPath = `mongodb://${process.env.MONGO_URL || 'localhost:27017'}/${process.env.MONGO_NAME || 'wl-test'}`
+  monoPath = `mongodb://${process.env.MONGO_URL || 'localhost:27017'}/${process.env.MONGO_NAME || 'NCKH'}`
 }
 mongoose.connect(monoPath, {
   useNewUrlParser: true,

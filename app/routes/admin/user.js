@@ -82,6 +82,43 @@ app.get("/:id", $(async (req, res) => {
   return res.json({ success: false, doc: null })
 }))
 
+app.get("/getInfoUser/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Tìm thông tin người dùng dựa trên ID
+    const user = await UserModel.findById(id).exec();
+    if (!user) {
+      return res.json({ success: false, error: "Không tìm thấy người dùng." });
+    }
+
+    // Tìm thông tin sinh viên và tư vấn viên dựa trên email của người dùng
+    const student = await StudentModel.findOne({ email: user.email }).exec();
+    const consultant = await ConsultantModel.findOne({ email: user.email }).exec();
+
+    // Tạo đối tượng trả về kết hợp thông tin người dùng, sinh viên và tư vấn viên
+    const doc = {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      role: user.role,
+      avatarUrl: user.avatarUrl,
+      studentInfo: student || null,
+      consultantInfo: consultant || null,
+    };
+
+    // Trả về phản hồi thành công
+    return res.json({ success: true, doc });
+  } catch (error) {
+    console.error("Lỗi: ", error);
+    return res.json({
+      success: false,
+      error: "Không thể lấy thông tin chi tiết của người dùng.",
+    });
+  }
+});
+
+
 app.post("/", $(async (req, res) => {
   const data = req.body
   if (data) {
