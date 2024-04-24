@@ -93,7 +93,7 @@ let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWO
 
 // }
 
-mongoose.connect(monoPath, {
+mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => {
