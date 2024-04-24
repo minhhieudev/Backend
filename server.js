@@ -54,7 +54,7 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
   }));
 
   // Đặt Access-Control-Allow-Origin trong header của response
-  res.header("Access-Control-Allow-Origin", "http://localhost:8081");
+  res.header("Access-Control-Allow-Origin", process.env.VUE_APP_FRONTEND_URL);
   
   // Đặt các tiêu đề CORS khác nếu cần thiết
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -66,7 +66,7 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
 
 
 const corsOptions = {
-  origin: 'http://localhost:8081', 
+  origin: process.env.VUE_APP_FRONTEND_URL, 
   optionsSuccessStatus: 200,
 };
 
@@ -84,7 +84,7 @@ app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:8081");
+  res.header("Access-Control-Allow-Origin", process.env.VUE_APP_FRONTEND_URL);
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
