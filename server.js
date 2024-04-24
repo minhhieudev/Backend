@@ -92,7 +92,8 @@ let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWO
 //   URI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nckh.hs2nnk2.mongodb.net/${process.env.MONGO_NAME || 'NCKH'}?retryWrites=true&w=majority&appName=NCKH`;
 
 // }
-
+console.log(process.env.MONGODB_CONNECT_URI)
+console.log(monoPath)
 mongoose.connect(monoPath, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
