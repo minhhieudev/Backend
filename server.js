@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require('mongoose')
+mongoose.set('strictQuery', false);
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
