@@ -82,7 +82,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // connect to mongo
 // let monoPath = `mongodb+srv://kimtrongdev2:HUYyfu1ovSqkxJde@cluster0.vawtbzy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
-let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nckh.hs2nnk2.mongodb.net/${process.env.MONGO_NAME || 'NCKH'}?retryWrites=true&w=majority&appName=NCKH`;
+let monoPath = 'mongodb+srv://minhhieudev:Kamehameha31@nckh.hs2nnk2.mongodb.net/?retryWrites=true&w=majority&appName=NCKH';
     
 // if (process.env.MONGO_URL) {
 //   monoPath = `mongodb://${process.env.MONGO_URL || 'localhost:27017'}/${process.env.MONGO_NAME || 'NCKH'}`
@@ -93,9 +93,10 @@ let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWO
 
 // }
 
-mongoose.connect(process.env.MONGODB_CONNECT_URI, {
+mongoose.connect(monoPath, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 30000 // Tăng thời gian chờ lên 30 giây
 }).then(() => {
   console.log("Đã kết nối tới Mongodb.");
 }).catch(err => {
@@ -119,6 +120,17 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 8000;
 app.use(logger('dev'));
 
+async function init() {
+  let settings = await db.setting.find()
+  settings.forEach(setting => {
+    globalConfig[setting.key] = setting.data
+  });
+
+  let adminDefaultUser = await db.user.findOne({ email: 'admin@gmail.com' })
+  if (!adminDefaultUser) {
+    db.user.create({ fullname: 'Admin', role: 'admin', email: 'admin@gmail.com', password: bcrypt.hashSync('123123qq@', 8) })
+  }
+}
 
 server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}.`);
