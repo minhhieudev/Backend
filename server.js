@@ -66,8 +66,11 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
 
 
 const corsOptions = {
-  origin: process.env.VUE_APP_FRONTEND_URL, 
-  optionsSuccessStatus: 200,
+  origin: [
+      process.env.VUE_APP_FRONTEND_URL, 
+      'https://minhhieudev.github.io' 
+  ],
+  optionsSuccessStatus: 200, 
 };
 
 require('dotenv').config()
