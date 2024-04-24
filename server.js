@@ -92,9 +92,7 @@ let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWO
 //   URI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nckh.hs2nnk2.mongodb.net/${process.env.MONGO_NAME || 'NCKH'}?retryWrites=true&w=majority&appName=NCKH`;
 
 // }
-console.log(process.env.MONGODB_CONNECT_URI)
-console.log(monoPath)
-mongoose.connect(monoPath, {
+mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 30000 // Tăng thời gian chờ lên 30 giây
