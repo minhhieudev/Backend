@@ -95,13 +95,15 @@ let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWO
 
 mongoose.connect(monoPath, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 30000 // Tăng thời gian chờ lên 30 giây
 }).then(() => {
   console.log("Đã kết nối tới Mongodb.");
 }).catch(err => {
   console.error("Connection error", err);
   process.exit();
 });
+
 
 // routes
 app.use("/uploads", express.static('public/uploads'));
