@@ -79,6 +79,13 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:8081");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
 // connect to mongo
 // let monoPath = `mongodb+srv://kimtrongdev2:HUYyfu1ovSqkxJde@cluster0.vawtbzy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
