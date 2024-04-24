@@ -62,9 +62,12 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
 
 
 const corsOptions = {
-  origin: 'http://localhost:8081', 
+  origin: 'http://localhost:8081',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 200,
 };
+
 
 require('dotenv').config()
 const methods = require('./app/helpers/methods')
