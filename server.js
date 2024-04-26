@@ -12,10 +12,11 @@ const socketIo = require("socket.io");
 const server = http.createServer(app);
 const io = require('socket.io')(server, {
   cors: {
-    origin: '*', // Thay đổi địa chỉ của ứng dụng Vue.js của bạn
-    methods: ['GET', 'POST'],
+      origin: 'https://minhhieudev.github.io',
+      methods: ['GET', 'POST'],
   },
 });
+
 
 io.on("connection", (socket) => {
   console.log("Client connected");
@@ -49,29 +50,27 @@ const upload = multer({ storage: storage });
 
 app.post("/public/upload", upload.array("file"), (req, res) => {
   const fileData = req.files.map(file => ({
-    filename: file.filename,
-    path: `/uploads/${file.filename}` 
+      filename: file.filename,
+      path: `/uploads/${file.filename}` 
   }));
-
-  // Đặt Access-Control-Allow-Origin trong header của response
-  res.header("Access-Control-Allow-Origin", process.env.VUE_APP_FRONTEND_URL);
-  
-  // Đặt các tiêu đề CORS khác nếu cần thiết
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
+  res.set("Access-Control-Allow-Origin", "https://minhhieudev.github.io");
   res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
+});
+
+app.use((req, res, next) => {
+  res.set("Access-Control-Allow-Origin", "https://minhhieudev.github.io");
+  res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
 });
 
 
 
 const corsOptions = {
-  origin: [
-      process.env.VUE_APP_FRONTEND_URL, 
-      'https://minhhieudev.github.io' 
-  ],
-  optionsSuccessStatus: 200, 
+  origin: 'https://minhhieudev.github.io', 
+  optionsSuccessStatus: 200,
 };
+
 
 require('dotenv').config()
 const methods = require('./app/helpers/methods')
@@ -87,7 +86,7 @@ app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", process.env.VUE_APP_FRONTEND_URL);
+  res.header("Access-Control-Allow-Origin", "http://localhost:8081");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
