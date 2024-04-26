@@ -15,7 +15,7 @@ router.get(
 
         // Kiểm tra xem trình duyệt đã được khởi động chưa
         if (!browserInstance) {
-            browserInstance = await puppeteer.launch();
+            browserInstance = await puppeteer.launch({ headless: 'new' });
         }
 
         // Tạo một trang mới từ trình duyệt đã khởi động trước đó
