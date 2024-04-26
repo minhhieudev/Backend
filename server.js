@@ -11,13 +11,14 @@ const logger = require('morgan');
 const http = require("http");
 const socketIo = require("socket.io");
 const server = http.createServer(app);
+const URL_FRONTEND = 'https://minhhieudev.github.io/Phan-mem-Co-van-hoc-tap'
+
 const io = require('socket.io')(server, {
   cors: {
-      origin: process.env.VUE_APP_FRONTEND_URL,
+      origin: URL_FRONTEND,
       methods: ['GET', 'POST'],
   },
 });
-
 
 io.on("connection", (socket) => {
   console.log("Client connected");
@@ -54,12 +55,12 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
       filename: file.filename,
       path: `/uploads/${file.filename}` 
   }));
-  res.set("Access-Control-Allow-Origin", process.env.VUE_APP_FRONTEND_URL);
+  res.set("Access-Control-Allow-Origin", URL_FRONTEND);
   res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
 });
 
 app.use((req, res, next) => {
-  res.set("Access-Control-Allow-Origin", process.env.VUE_APP_FRONTEND_URL);
+  res.set("Access-Control-Allow-Origin", URL_FRONTEND);
   res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.set("Access-Control-Allow-Credentials", "true"); // Nếu cần thiết, cho phép gửi thông tin đăng nhập
@@ -68,13 +69,13 @@ app.use((req, res, next) => {
 
 
 app.use(cors({
-  origin: process.env.VUE_APP_FRONTEND_URL,
+  origin: URL_FRONTEND,
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
 }));
 
 const corsOptions = {
-  origin: process.env.VUE_APP_FRONTEND_URL, // Chấp nhận nguồn gốc từ frontend của bạn
+  origin: URL_FRONTEND, // Chấp nhận nguồn gốc từ frontend của bạn
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true,
@@ -83,7 +84,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-console.log(process.env.VUE_APP_FRONTEND_URL)
+console.log(URL_FRONTEND)
 
 const methods = require('./app/helpers/methods')
 global._APP_SECRET = process.env.SECRET || 'secret'
@@ -97,7 +98,7 @@ app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({
-  origin: process.env.VUE_APP_FRONTEND_URL,
+  origin: URL_FRONTEND,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
 }));
