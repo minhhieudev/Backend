@@ -15,9 +15,9 @@ router.get(
 
             // Kiểm tra xem trình duyệt đã được khởi động chưa
             if (!browserInstance) {
-                await puppeteer.launch({
-                    headless: "new",
-                    executablePath: 'C:\\Users\\Admin\\.cache\\puppeteer\\chrome\\win64-119.0.6045.105\\chrome-win64\\chrome.exe' // Đường dẫn bạn đã cài đặt
+                browserInstance = await puppeteer.launch({
+                    headless: 'new',
+                    args: ['--no-sandbox', '--disable-setuid-sandbox']
                 });
             }
 

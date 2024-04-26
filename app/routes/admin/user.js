@@ -176,7 +176,7 @@ app.post('/updateAvatarUser/:id', async (req, res) => {
 
   try {
     const userId = req.params.id;
-    const newUrl = req.body.avatarUrl.newUrl; // Truy xuất giá trị avatarUrl trực tiếp từ client
+    const newUrl = 'https://backend-3lvb.onrender.com'+req.body.avatarUrl.newUrl; // Truy xuất giá trị avatarUrl trực tiếp từ client
 
     // Kết hợp newUrl với /upload/
 
@@ -198,7 +198,7 @@ app.post('/updateNotificationForUser/:id', async (req, res) => {
   try {
     const userId = req.params.id;
     const notificationList = req.body.notifications;
-    
+
 
     // Kiểm tra nếu notificationList không phải là một mảng thì trả về lỗi
     if (!Array.isArray(notificationList)) {
@@ -208,7 +208,7 @@ app.post('/updateNotificationForUser/:id', async (req, res) => {
     // Cập nhật mảng notifications của người dùng
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
-      { notifications:  notificationList},
+      { notifications: notificationList },
     );
 
     if (!updatedUser) {
@@ -245,8 +245,6 @@ app.get("/getNotification/:id", async (req, res) => {
 app.post('/addNotification/:id', async (req, res) => {
   try {
     const userId = req.params.id;
-console.log(userId)
-
     const newNotification = req.body.notification;
 
     // Cập nhật mảng notifications của người dùng

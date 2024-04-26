@@ -51,19 +51,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-app.post('/public/upload', upload.array('file'), (req, res) => {
+app.post("/public/upload", upload.array("file"), (req, res) => {
   const fileData = req.files.map(file => ({
       filename: file.filename,
       path: `/uploads/${file.filename}` 
   }));
-  
-  res.set('Access-Control-Allow-Origin', 'https://minhhieudev.github.io');
-  res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, X-Requested-With, Accept');
-  
-  res.json({ success: true, message: 'Tệp đã được tải lên thành công', files: fileData });
+  res.set("Access-Control-Allow-Origin", URL_FRONTEND);
+  res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
 });
-
 
 
 
