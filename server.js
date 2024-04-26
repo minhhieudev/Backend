@@ -11,7 +11,7 @@ const logger = require('morgan');
 const http = require("http");
 const socketIo = require("socket.io");
 const server = http.createServer(app);
-const URL_FRONTEND = 'https://minhhieudev.github.io/Phan-mem-Co-van-hoc-tap'
+const URL_FRONTEND = 'https://minhhieudev.github.io'
 
 const io = require('socket.io')(server, {
   cors: {
