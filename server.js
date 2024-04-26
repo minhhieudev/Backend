@@ -1,73 +1,72 @@
 const express = require("express");
-const mongoose = require('mongoose')
-mongoose.set('strictQuery', false);
+const mongoose = require('mongoose');
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
-const app = express();
 const logger = require('morgan');
-
+const multer = require("multer");
 const http = require("http");
 const socketIo = require("socket.io");
+
+const dotenv = require('dotenv');
+const methods = require('./app/helpers/methods');
+const db = require("./app/models");
+const adminRoutes = require('./app/routes/admin');
+
+dotenv.config();  // Load environment variables from a .env file
+
+// Create an Express application and HTTP server
+const app = express();
 const server = http.createServer(app);
-const io = require('socket.io')(server, {
+
+// Create a Socket.IO server with CORS configuration
+const io = socketIo(server, {
   cors: {
-      origin: 'https://minhhieudev.github.io',
-      methods: ['GET', 'POST'],
+    origin: process.env.CORS_ORIGIN || 'https://minhhieudev.github.io',
+    methods: ['GET', 'POST'],
   },
 });
 
-
+// Socket.IO event handling
 io.on("connection", (socket) => {
   console.log("Client connected");
 
-  // Lắng nghe sự kiện khi có thông báo mới được tạo
-  socket.on("newNotification", async () => {
-    
-
+  // Listen for "newNotification" event
+  socket.on("newNotification", () => {
     io.emit("updateNotifications");
   });
 
-  // Ngắt kết nối
+  // Handle disconnection
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
 });
 
-const multer = require("multer");
-
+// Multer configuration for file uploads
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads"); // Đặt thư mục đích cho các tệp đã tải lên
+  destination: (req, file, cb) => {
+    cb(null, "public/uploads");
   },
-  filename: function (req, file, cb) {
-    // Đặt tên tệp cho tệp đã tải lên
+  filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
+// File upload endpoint
 app.post("/public/upload", upload.array("file"), (req, res) => {
   const fileData = req.files.map(file => ({
-      filename: file.filename,
-      path: `/uploads/${file.filename}` 
+    filename: file.filename,
+    path: `/uploads/${file.filename}`
   }));
-  res.set("Access-Control-Allow-Origin", "https://minhhieudev.github.io");
-  res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
+
+  res.json({ success: true, message: "Files uploaded successfully", files: fileData });
 });
 
-app.use((req, res, next) => {
-  res.set("Access-Control-Allow-Origin", "https://minhhieudev.github.io");
-  res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
-
-
+// Apply CORS settings using middleware
 const corsOptions = {
-  origin: 'https://minhhieudev.github.io', // Chấp nhận nguồn gốc từ frontend của bạn
+  origin: process.env.CORS_ORIGIN || 'https://minhhieudev.github.io',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true,
@@ -75,80 +74,68 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
-require('dotenv').config()
-const methods = require('./app/helpers/methods')
-global._APP_SECRET = process.env.SECRET || 'secret'
-global.getCollection = methods.getCollection
-global.globalConfig = {}
-const db = require("./app/models");
-global.db = db
-global.APP_DIR = __dirname
-
+// Middleware to handle body parsing
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:8081");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+// Logger middleware
+app.use(logger('dev'));
 
-
-
-// connect to mongo
-// let monoPath = `mongodb+srv://kimtrongdev2:HUYyfu1ovSqkxJde@cluster0.vawtbzy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-
-let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nckh.hs2nnk2.mongodb.net/${process.env.MONGO_NAME || 'NCKH'}?retryWrites=true&w=majority&appName=NCKH`;
-    
-// if (process.env.MONGO_URL) {
-//   monoPath = `mongodb://${process.env.MONGO_URL || 'localhost:27017'}/${process.env.MONGO_NAME || 'NCKH'}`
-// }
-
-// if (process.env.MONGO_URL) {
-//   URI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nckh.hs2nnk2.mongodb.net/${process.env.MONGO_NAME || 'NCKH'}?retryWrites=true&w=majority&appName=NCKH`;
-
-// }
+// Connect to MongoDB
 mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 30000 // Tăng thời gian chờ lên 30 giây
-}).then(() => {
-  console.log("Đã kết nối tới Mongodb.");
-}).catch(err => {
-  console.error("Connection error", err);
-  process.exit();
-});
-
-
-// routes
-app.use("/uploads", express.static('public/uploads'));
-app.use('/api/v1/admin', require('./app/routes/admin'));
-app.use('*', (req, res) => {
-  res.json({ status: 'error', msg: 'Not Route, call admin' });
-});
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ success: false, error: 'Internal Server Error' });
-});
-
-// set port, listen for requests
-const PORT = process.env.PORT || 8000;
-app.use(logger('dev'));
-
-async function init() {
-  let settings = await db.setting.find()
-  settings.forEach(setting => {
-    globalConfig[setting.key] = setting.data
+  serverSelectionTimeoutMS: 30000,
+})
+  .then(() => console.log("Connected to MongoDB"))
+  .catch(err => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
   });
 
-  let adminDefaultUser = await db.user.findOne({ email: 'admin@gmail.com' })
-  if (!adminDefaultUser) {
-    db.user.create({ fullname: 'Admin', role: 'admin', email: 'admin@gmail.com', password: bcrypt.hashSync('123123qq@', 8) })
+// Define static file serving route
+app.use("/uploads", express.static('public/uploads'));
+
+// Use admin routes
+app.use('/api/v1/admin', adminRoutes);
+
+// Catch-all route
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+// Define the port and start the server
+const PORT = process.env.PORT || 8000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Initialization function to set up global configurations
+async function init() {
+  const settings = await db.setting.find();
+  global.globalConfig = {};
+
+  settings.forEach(setting => {
+    global.globalConfig[setting.key] = setting.data;
+  });
+
+  const adminUser = await db.user.findOne({ email: 'admin@gmail.com' });
+  if (!adminUser) {
+    const hashedPassword = bcrypt.hashSync('123123qq@', 8);
+    await db.user.create({
+      fullname: 'Admin',
+      role: 'admin',
+      email: 'admin@gmail.com',
+      password: hashedPassword,
+    });
   }
 }
 
-server.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+// Run the initialization function
+init();
