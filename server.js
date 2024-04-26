@@ -64,7 +64,11 @@ app.use((req, res, next) => {
   next();
 });
 
-
+app.use(cors({
+  origin: 'https://minhhieudev.github.io',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
+}));
 
 const corsOptions = {
   origin: 'https://minhhieudev.github.io', // Chấp nhận nguồn gốc từ frontend của bạn
