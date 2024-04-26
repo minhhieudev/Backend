@@ -60,9 +60,11 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
 app.use((req, res, next) => {
   res.set("Access-Control-Allow-Origin", "https://minhhieudev.github.io");
   res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.set("Access-Control-Allow-Credentials", "true"); // Nếu cần thiết, cho phép gửi thông tin đăng nhập
   next();
 });
+
 
 app.use(cors({
   origin: 'https://minhhieudev.github.io',
