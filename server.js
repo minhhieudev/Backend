@@ -56,7 +56,7 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
       filename: file.filename,
       path: `/uploads/${file.filename}` 
   }));
-  res.set("Access-Control-Allow-Origin", URL_FRONTEND);
+  res.header("Access-Control-Allow-Origin", 'https://minhhieudev.github.io');
   res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
 });
 
