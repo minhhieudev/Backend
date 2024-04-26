@@ -67,9 +67,13 @@ app.use((req, res, next) => {
 
 
 const corsOptions = {
-  origin: 'https://minhhieudev.github.io', 
-  optionsSuccessStatus: 200,
+  origin: 'https://minhhieudev.github.io', // Chấp nhận nguồn gốc từ frontend của bạn
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true,
 };
+
+app.use(cors(corsOptions));
 
 
 require('dotenv').config()
@@ -81,7 +85,6 @@ const db = require("./app/models");
 global.db = db
 global.APP_DIR = __dirname
 
-app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
