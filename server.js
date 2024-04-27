@@ -118,6 +118,7 @@ const PORT = process.env.PORT || 8000;
 app.use(logger('dev'));
 
 app.post("/public/upload", upload.array("file"), (req, res) => {
+  console.log('HELLO')
   const fileData = req.files.map(file => ({
       filename: file.filename,
       path: `/uploads/${file.filename}`
