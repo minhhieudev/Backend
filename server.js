@@ -53,6 +53,7 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
 });
 
 
+
 app.use((req, res, next) => {
   res.set("Access-Control-Allow-Origin", URL_FRONTEND);
   res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -62,7 +63,20 @@ app.use((req, res, next) => {
 });
 
 
+app.use(cors({
+  origin: URL_FRONTEND,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
+}));
 
+const corsOptions = {
+  origin: URL_FRONTEND, // Chấp nhận nguồn gốc từ frontend của bạn
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 
 console.log(URL_FRONTEND)
@@ -78,6 +92,12 @@ global.APP_DIR = __dirname
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(cors({
+  origin: URL_FRONTEND,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
+}));
+    
 
 mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
