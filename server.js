@@ -101,6 +101,17 @@ mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   process.exit();
 });
 
+
+// routes
+app.use("/uploads", express.static('public/uploads'));
+app.use('/api/v1/admin', require('./app/routes/admin'));
+app.use('*', (req, res) => {
+  res.json({ status: 'error', msg: 'Not Route, call admin' });
+});
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ success: false, error: 'Internal Server Error' });
+});
 app.post("/public/upload", upload.array("file"), (req, res) => {
   console.log('HELLO')
   const fileData = req.files.map(file => ({
@@ -111,16 +122,6 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
   res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
   res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
   res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
-});
-// routes
-app.use("/uploads", express.static('public/uploads'));
-app.use('/api/v1/admin', require('./app/routes/admin'));
-app.use('*', (req, res) => {
-  res.json({ status: 'error', msg: 'Not Route, call admin' });
-});
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ success: false, error: 'Internal Server Error' });
 });
 
 const PORT = process.env.PORT || 8000;
