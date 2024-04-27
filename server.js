@@ -10,7 +10,7 @@ const logger = require('morgan');
 
 const http = require("http");
 const server = http.createServer(app);
-const URL_FRONTEND = 'https://minhhieudev.github.io'
+const URL_FRONTEND = 'https://minhhieudev.github.io/Phan-mem-Co-van-hoc-tap'
 
 const io = require('socket.io')(server, {
   cors: {
@@ -31,6 +31,18 @@ io.on("connection", (socket) => {
   });
 });
 
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads"); // Đặt thư mục đích cho các tệp đã tải lên
+  },
+  filename: function (req, file, cb) {
+    // Đặt tên tệp cho tệp đã tải lên
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 
 app.use((req, res, next) => {
@@ -58,7 +70,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-
 console.log(URL_FRONTEND)
 
 const methods = require('./app/helpers/methods')
@@ -82,7 +93,7 @@ app.use(cors({
 mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 30000 
+  serverSelectionTimeoutMS: 30000 // Tăng thời gian chờ lên 30 giây
 }).then(() => {
   console.log("Đã kết nối tới Mongodb.");
 }).catch(err => {
@@ -90,42 +101,21 @@ mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   process.exit();
 });
 
-const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads"); // Đặt thư mục đích cho các tệp đã tải lên
-  },
-  filename: function (req, file, cb) {
-    // Đặt tên tệp cho tệp đã tải lên
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const upload = multer({ storage: storage });
-
 app.post("/public/upload", upload.array("file"), (req, res) => {
-  console.log('HELLO');
-  
+  console.log('HELLO')
   const fileData = req.files.map(file => ({
       filename: file.filename,
       path: `/uploads/${file.filename}`
   }));
-  
-  res.header("Access-Control-Allow-Origin", URL_FRONTEND);
+  res.header("Access-Control-Allow-Origin", 'https://minhhieudev.github.io/Phan-mem-Co-van-hoc-tap');
   res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
   res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
-  
-  res.json({
-      success: true,
-      message: "Tệp đã được tải lên thành công",
-      files: fileData
-  });
+  res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
 });
+
 // routes
 app.use("/uploads", express.static('public/uploads'));
 app.use('/api/v1/admin', require('./app/routes/admin'));
-
-
 app.use('*', (req, res) => {
   res.json({ status: 'error', msg: 'Not Route, call admin' });
 });
@@ -134,8 +124,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, error: 'Internal Server Error' });
 });
 
+// set port, listen for requests
 const PORT = process.env.PORT || 8000;
 app.use(logger('dev'));
+
 
 
 
