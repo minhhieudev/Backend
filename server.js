@@ -1,5 +1,4 @@
 const express = require("express");
-require('dotenv').config()
 const mongoose = require('mongoose')
 mongoose.set('strictQuery', false);
 const bodyParser = require("body-parser");
@@ -9,22 +8,25 @@ const app = express();
 const logger = require('morgan');
 
 const http = require("http");
+const socketIo = require("socket.io");
 const server = http.createServer(app);
-const URL_FRONTEND = 'https://minhhieudev.github.io'
-
 const io = require('socket.io')(server, {
   cors: {
-      origin: URL_FRONTEND,
-      methods: ['GET', 'POST'],
+    origin: '*', // Thay đổi địa chỉ của ứng dụng Vue.js của bạn
+    methods: ['GET', 'POST'],
   },
 });
 
 io.on("connection", (socket) => {
   console.log("Client connected");
+
   // Lắng nghe sự kiện khi có thông báo mới được tạo
   socket.on("newNotification", async () => {
+
+
     io.emit("updateNotifications");
   });
+
   // Ngắt kết nối
   socket.on("disconnect", () => {
     console.log("Client disconnected");
@@ -32,6 +34,7 @@ io.on("connection", (socket) => {
 });
 
 const multer = require("multer");
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/uploads"); // Đặt thư mục đích cho các tệp đã tải lên
@@ -44,34 +47,26 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+app.post("/public/upload", upload.array("file"), (req, res) => {
+  const fileData = req.files.map(file => ({
+    filename: file.filename,
+    path: `/uploads/${file.filename}`
+  }));
+  // Xử lý tệp đã tải lên, lưu chi tiết của chúng vào cơ sở dữ liệu, v.v.
 
-app.use((req, res, next) => {
-  res.set("Access-Control-Allow-Origin", URL_FRONTEND);
-  res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.set("Access-Control-Allow-Credentials", "true"); // Nếu cần thiết, cho phép gửi thông tin đăng nhập
-  next();
+  // Đặt Access-Control-Allow-Origin trong header của response
+  res.header("Access-Control-Allow-Origin", "http://localhost:8081");
+  res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
 });
 
 
-app.use(cors({
-  origin: URL_FRONTEND,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
-}));
 
 const corsOptions = {
-  origin: URL_FRONTEND, // Chấp nhận nguồn gốc từ frontend của bạn
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-  credentials: true,
+  origin: 'http://localhost:8081',
+  optionsSuccessStatus: 200,
 };
 
-app.use(cors(corsOptions));
-
-
-console.log(URL_FRONTEND)
-
+require('dotenv').config()
 const methods = require('./app/helpers/methods')
 global._APP_SECRET = process.env.SECRET || 'secret'
 global.getCollection = methods.getCollection
@@ -80,16 +75,31 @@ const db = require("./app/models");
 global.db = db
 global.APP_DIR = __dirname
 
+app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(cors({
-  origin: URL_FRONTEND,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
-}));
-    
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:8081");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
+
+
+// connect to mongo
+// let monoPath = `mongodb+srv://kimtrongdev2:HUYyfu1ovSqkxJde@cluster0.vawtbzy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+
+let monoPath = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nckh.hs2nnk2.mongodb.net/${process.env.MONGO_NAME || 'NCKH'}?retryWrites=true&w=majority&appName=NCKH`;
+
+// if (process.env.MONGO_URL) {//   monoPath = `mongodb://${process.env.MONGO_URL || 'localhost:27017'}/${process.env.MONGO_NAME || 'NCKH'}`
+// }
+
+// if (process.env.MONGO_URL) {
+//   URI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nckh.hs2nnk2.mongodb.net/${process.env.MONGO_NAME || 'NCKH'}?retryWrites=true&w=majority&appName=NCKH`;
+
+// }
 mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -117,17 +127,17 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 8000;
 app.use(logger('dev'));
 
-app.post("/public/upload", upload.array("file"), (req, res) => {
-  const fileData = req.files.map(file => ({
-      filename: file.filename,
-      path: `/uploads/${file.filename}`
-  }));
-  res.header("Access-Control-Allow-Origin", 'https://minhhieudev.github.io');
-  res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
-  res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
-});
+async function init() {
+  let settings = await db.setting.find()
+  settings.forEach(setting => {
+    globalConfig[setting.key] = setting.data
+  });
 
+  let adminDefaultUser = await db.user.findOne({ email: 'admin@gmail.com' })
+  if (!adminDefaultUser) {
+    db.user.create({ fullname: 'Admin', role: 'admin', email: 'admin@gmail.com', password: bcrypt.hashSync('123123qq@', 8) })
+  }
+}
 
 server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}.`);
