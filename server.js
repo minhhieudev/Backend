@@ -93,7 +93,7 @@ app.use(cors({
 mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 30000 // Tăng thời gian chờ lên 30 giây
+  serverSelectionTimeoutMS: 30000 
 }).then(() => {
   console.log("Đã kết nối tới Mongodb.");
 }).catch(err => {
@@ -123,11 +123,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, error: 'Internal Server Error' });
 });
 
-// set port, listen for requests
 const PORT = process.env.PORT || 8000;
 app.use(logger('dev'));
-
-
 
 
 server.listen(PORT, async () => {
