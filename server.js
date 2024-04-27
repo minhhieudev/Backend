@@ -10,7 +10,7 @@ const logger = require('morgan');
 
 const http = require("http");
 const server = http.createServer(app);
-const URL_FRONTEND = 'http://localhost:8081'
+const URL_FRONTEND = 'https://backend-3lvb.onrender.com'
 
 const io = require('socket.io')(server, {
   cors: {
@@ -108,7 +108,7 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
       filename: file.filename,
       path: `/uploads/${file.filename}`
   }));
-  res.header("Access-Control-Allow-Origin", 'http://localhost:8081');
+  res.header("Access-Control-Allow-Origin", 'https://backend-3lvb.onrender.com');
   res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
   res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
   res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
