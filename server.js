@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 
 app.use(cors({
   origin: URL_FRONTEND,
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
 }));
 
