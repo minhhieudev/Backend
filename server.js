@@ -107,7 +107,7 @@ app.post("/public/upload", upload.array("file"), (req, res) => {
       filename: file.filename,
       path: `/uploads/${file.filename}`
   }));
-  res.header("Access-Control-Allow-Origin", 'https://minhhieudev.github.io/Phan-mem-Co-van-hoc-tap');
+  res.header("Access-Control-Allow-Origin", 'https://minhhieudev.github.io');
   res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
   res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
   res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
