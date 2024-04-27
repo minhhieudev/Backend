@@ -14,8 +14,10 @@ const URL_FRONTEND = 'https://minhhieudev.github.io'
 
 const io = require('socket.io')(server, {
   cors: {
-      origin: URL_FRONTEND,
-      methods: ['GET', 'POST'],
+    origin: URL_FRONTEND,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
+
   },
 });
 
@@ -45,10 +47,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 app.post("/public/upload", upload.array("file"), (req, res) => {
   const fileData = req.files.map(file => ({
-      filename: file.filename,
-      path: `/uploads/${file.filename}` 
+    filename: file.filename,
+    path: `/uploads/${file.filename}`
   }));
-  res.header("Access-Control-Allow-Origin", 'https://minhhieudev.github.io');
+  res.header("Access-Control-Allow-Origin", '*');
   res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
 });
 
@@ -97,7 +99,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
 }));
-    
+
 
 mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   useNewUrlParser: true,
