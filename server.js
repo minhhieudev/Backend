@@ -31,18 +31,6 @@ io.on("connection", (socket) => {
   });
 });
 
-const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads"); // Đặt thư mục đích cho các tệp đã tải lên
-  },
-  filename: function (req, file, cb) {
-    // Đặt tên tệp cho tệp đã tải lên
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const upload = multer({ storage: storage });
 
 
 app.use((req, res, next) => {
@@ -68,17 +56,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.post("/public/upload", upload.array("file"), (req, res) => {
-  console.log('HELLO')
-  const fileData = req.files.map(file => ({
-      filename: file.filename,
-      path: `/uploads/${file.filename}`
-  }));
-  res.header("Access-Control-Allow-Origin", 'https://minhhieudev.github.io');
-  res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
-  res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
-});
 
 
 
@@ -113,7 +90,37 @@ mongoose.connect(process.env.MONGODB_CONNECT_URI, {
   process.exit();
 });
 
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads"); // Đặt thư mục đích cho các tệp đã tải lên
+  },
+  filename: function (req, file, cb) {
+    // Đặt tên tệp cho tệp đã tải lên
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 
+const upload = multer({ storage: storage });
+
+app.post("/public/upload", upload.array("file"), (req, res) => {
+  console.log('HELLO');
+  
+  const fileData = req.files.map(file => ({
+      filename: file.filename,
+      path: `/uploads/${file.filename}`
+  }));
+  
+  res.header("Access-Control-Allow-Origin", URL_FRONTEND);
+  res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
+  
+  res.json({
+      success: true,
+      message: "Tệp đã được tải lên thành công",
+      files: fileData
+  });
+});
 // routes
 app.use("/uploads", express.static('public/uploads'));
 app.use('/api/v1/admin', require('./app/routes/admin'));
