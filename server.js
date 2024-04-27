@@ -117,6 +117,17 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 8000;
 app.use(logger('dev'));
 
+app.post("/public/upload", upload.array("file"), (req, res) => {
+  console.log('HELLO')
+  const fileData = req.files.map(file => ({
+      filename: file.filename,
+      path: `/uploads/${file.filename}`
+  }));
+  res.header("Access-Control-Allow-Origin", 'http://localhost:8081');
+  res.header("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization');
+  res.json({ success: true, message: "Tệp đã được tải lên thành công", files: fileData });
+});
 
 
 server.listen(PORT, async () => {
