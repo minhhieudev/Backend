@@ -1,16 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const { Builder, By, until } = require('selenium-webdriver');
 
 
-// Khởi động trình duyệt Puppeteer một lần và tái sử dụng nó cho mỗi yêu cầu
-const browserInstance = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    executablePath: '/usr/bin/google-chrome'  // Đường dẫn mặc định của Chrome trên hệ thống Linux
-});
+
 
 
 router.get(
