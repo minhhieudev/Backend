@@ -6,8 +6,10 @@ const schema = new mongoose.Schema({
     fullName: { type: String },
     className: { type: String },
     department: { type: String},
-    majors: { type: String},
-    dateOfBirth: { type: Date }
+    dateOfBirth: { type: Date },
+
+    isComplete: { type: Boolean,default: false},
+
 
 });
 
