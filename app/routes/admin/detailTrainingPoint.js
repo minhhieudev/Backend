@@ -4,6 +4,78 @@ const $ = require("../../middlewares/safe-call");
 const modelName = "detailTrainingPoint";
 const DetailTrainingPointModel = db[modelName];
 
+
+router.get(
+  "/search",
+  $(async (req, res) => {
+    try {
+      const { semester, schoolYear } = req.query;
+
+      // Kiểm tra nếu không có giá trị semester hoặc schoolYear được cung cấp
+      if (!semester || !schoolYear) {
+        return res.status(400).json({
+          success: false,
+          error: "Missing required query parameters: semester and schoolYear",
+        });
+      }
+
+      // Truy vấn cơ sở dữ liệu DetailTrainingPointModel với điều kiện semester và schoolYear
+      const result = await DetailTrainingPointModel.aggregate([
+        {
+          $match: {
+            semester: semester,
+            schoolYear: schoolYear,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $unwind: "$userDetails",
+        },
+        {
+          $lookup: {
+            from: "students",
+            localField: "userDetails.email",
+            foreignField: "email",
+            as: "studentDetails",
+          },
+        },
+        {
+          $unwind: "$studentDetails",
+        },
+        {
+          $project: {
+            _id: 1,
+            criteriaList: 1,
+            semester: 1,
+            schoolYear: 1,
+            status: 1,
+            Total_selfAssessment: 1,
+            Total_groupAssessment: 1,
+            Total_consultantAssessment: 1,
+            studentDetails: 1,
+            createdAt: 1,
+          },
+        },
+      ]);
+
+      // Trả về kết quả dưới dạng JSON
+      return res.json({ success: true, result });
+    } catch (error) {
+      console.error("Error: ", error);
+      return res.status(500).json({
+        success: false,
+        error: "Internal Server Error",
+      });
+    }
+  })
+);
 // Lấy danh sách điểm rèn luyện
 router.get(
   "/",
@@ -57,6 +129,7 @@ router.get(
     }
   })
 );
+
 
 router.post(
   "/status/:id",

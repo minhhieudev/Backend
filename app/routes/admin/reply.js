@@ -37,7 +37,8 @@ router.get(
   $(async (req, res) => {
     try {
       const replyId = req.params.id;
-      const reply = await ReplyModel.find({ reply: replyId })
+      console.log(replyId)
+      const reply = await ReplyModel.find({ post: replyId })
         .populate("post")
         .populate({
           path: "user",

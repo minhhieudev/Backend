@@ -10,7 +10,7 @@ const postSchema = new mongoose.Schema({
   }],
   postType: { type: String },
   comments: { type: Number, default: 0 }, 
-  answers: [{ type: mongoose.Types.ObjectId, ref: "answer" }],
+  replys: [{ type: mongoose.Types.ObjectId, ref: "reply" }],
   pinned: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 }, 

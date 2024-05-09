@@ -6,7 +6,39 @@ const StudentModel = db[modelName];
 
 
 
+// Route trả về tên lớp và danh sách sinh viên của lớp đó
+router.get("/getStudentForClass", async (req, res) => {
+  try {
+    // Lấy danh sách tất cả các lớp trong cơ sở dữ liệu
+    const classNames = await StudentModel.distinct("className");
 
+    // Tạo danh sách hứa hẹn cho mỗi lớp
+    const promises = classNames.map(async className => {
+      // Tìm tất cả sinh viên trong lớp hiện tại
+      // Đảm bảo truy vấn đúng trường className, và loại bỏ _id và className
+      const listStudents = await StudentModel.find()
+      .where('className').equals(className)
+      .select('-_id -className');
+  
+
+
+      // Trả về thông tin lớp và danh sách sinh viên
+      return {
+        className,
+        listStudents,
+      };
+    });
+
+    // Chờ tất cả các hứa hẹn hoàn thành
+    const result = await Promise.all(promises);
+
+    // Trả về danh sách kết quả dưới dạng JSON
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error("Error: ", error);
+    res.json({ success: false, error: "Không thể lấy danh sách lớp và sinh viên." });
+  }
+});
 
 router.get(
   "/",
@@ -41,6 +73,51 @@ router.get("/class-list", async (req, res) => {
     });
   }
 });
+router.post(
+  "/updateIsComplete",
+  async (req, res) => {
+    try {
+      // Tìm tất cả sinh viên trong cơ sở dữ liệu
+      const students = await StudentModel.find();
+      
+      // Kiểm tra nếu không có sinh viên nào
+      if (students.length === 0) {
+        return res.json({ success: false, error: "Không tìm thấy sinh viên nào để cập nhật." });
+      }
+      
+      for (const student of students) {
+        student.isComplete = false; // Đảo ngược giá trị của isComplete
+        await student.save(); // Lưu lại thay đổi
+      }
+
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("Error: ", error);
+      return res.json({ success: false });
+    }
+  }
+);
+router.post(
+  "/updateIsCompleteId",
+  async (req, res) => {
+    try {
+      const {id} = req.query
+      const student = await StudentModel.findById(id);
+
+      if (!student) {
+        return res.json({ success: false, error: "Không tìm thấy sinh viên với ID đã cung cấp." });
+      }
+      student.isComplete = true;
+
+      await student.save();
+
+      return res.json({ success: true});
+    } catch (error) {
+      console.error("Error: ", error);
+      return res.json({ success: false });
+    }
+  }
+);
 
 router.get("/khoaList", async (req, res) => {
   try {
@@ -219,6 +296,16 @@ router.delete("/:id", $(async (req, res) => {
 
   return res.json({ success: false })
 }))
+
+
+
+
+
+
+
+
+module.exports = router;
+
 
 
 module.exports = router;

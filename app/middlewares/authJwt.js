@@ -6,7 +6,8 @@ verifyToken = (req, res, next) => {
     let token = req.headers["x-access-token"];
 
     if (!token) {
-        return res.status(403).send({ code: 'error', message: "Bạn không có quyền truy cập" });
+        return res.status(403);
+        //return res.status(403).send({ code: 'error', message: "Bạn không có quyền truy cập" });
     }
 
     jwt.verify(token, _APP_SECRET, (err, decoded) => {
