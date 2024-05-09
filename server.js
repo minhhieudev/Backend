@@ -21,7 +21,6 @@ const io = require('socket.io')(server, {
 
 io.on("connection", (socket) => {
   console.log("Client connected");
-  // Lắng nghe sự kiện khi có thông báo mới được tạo
   socket.on("newNotification", async () => {
     io.emit("updateNotifications");
   });
@@ -34,7 +33,7 @@ io.on("connection", (socket) => {
 const multer = require("multer");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/uploads"); // Đặt thư mục đích cho các tệp đã tải lên
+    cb(null, "public/uploads");
   },
   filename: function (req, file, cb) {
     // Đặt tên tệp cho tệp đã tải lên
@@ -68,7 +67,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 
 console.log(URL_FRONTEND)
 
