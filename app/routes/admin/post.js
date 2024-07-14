@@ -3,7 +3,8 @@ const router = express.Router();
 const $ = require("../../middlewares/safe-call");
 const modelName = "post";
 const PostModel = db[modelName];
-
+const path = require("path");
+const fs = require("fs");
 
 // Custom routes
 router.get(
@@ -46,7 +47,49 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get(
+  "/paginated",
+  $(async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10;
+      const skip = (page - 1) * pageSize;
 
+      const total = await PostModel.countDocuments({});
+      const totalPages = Math.ceil(total / pageSize);
+
+      const posts = await PostModel.find({})
+        .populate({
+          path: "user",
+          select: "fullname avatarUrl",
+        })
+        .skip(skip)
+        .limit(pageSize)
+        .sort({ createdAt: -1 });
+
+      const pagination = {
+        total,
+        page,
+        pageSize,
+        totalPages,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: {
+          pagination,
+          posts,
+        },
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+      return res.status(500).json({
+        success: false,
+        error: "Không thể lấy bài đăng",
+      });
+    }
+  })
+);
 router.get("/:id", async (req, res) => {
   try {
     const postId = req.params.id;
@@ -110,33 +153,6 @@ router.post(
   })
 );
 
-// router.post(
-//   "/:id",
-//   $(async (req, res) => {
-//     try {
-//       const questionId = req.params.id;
-
-//       // Cập nhật giá trị likes cho câu hỏi dựa trên ID
-// const updatedQuestion = await PostModel.findOneAndUpdate(
-//   { _id: questionId },
-//   { $inc: { likes: 1 } },
-//   { new: true }
-// );
-
-
-//       if (!updatedQuestion) {
-//         return res
-//           .status(404)
-//           .json({ success: false, error: "Câu hỏi không tồn tại." });
-//       }
-
-//       res.json(updatedQuestion); // Gửi lại tài liệu đã cập nhật cho người dùng
-//     } catch (err) {
-//       console.error(err); // In ra lỗi
-//       res.status(500).json(err); // Gửi lại lỗi cho người dùng
-//     }
-//   })
-// );
 router.post(
   "/:id/count",
   $(async (req, res) => {
@@ -208,28 +224,60 @@ router.post('/updatePinnedStatus/:id', async (req, res) => {
   }
 });
 
+
 router.delete(
   "/:id",
   $(async (req, res) => {
+    console.log(__dirname)
     const id = req.params.id;
     if (id) {
-      const result = await PostModel.deleteOne({ _id: id }).catch(
-        (error) => {
-          console.error("Error: ", error);
-          return null;
+      try {
+        // Tìm bài đăng và lấy đường dẫn của các tệp đính kèm
+        const post = await PostModel.findById(id);
+        if (!post) {
+          return res.json({ success: false, error: "Bài đăng không tồn tại." });
         }
-      );
 
-      if (result && result.deletedCount) {
+        const attachments = post.attachmentPath;
+
+        // Xóa các tệp đính kèm
+        if (attachments && attachments.length > 0) {
+          attachments.forEach((attachment) => {
+            const filePath = path.join(__dirname, '../../../public', attachment.path);
+            console.log(filePath)
+            fs.unlink(filePath, (err) => {
+              if (err) {
+                console.error("Lỗi khi xóa tệp: ", err);
+              }
+            });
+          });
+        }
+
+        // Xóa bài đăng
+        const result = await PostModel.deleteOne({ _id: id });
+
+        if (result && result.deletedCount) {
+          return res.json({
+            success: true,
+            status: "success",
+            message: "Xóa hoàn tất.",
+          });
+        } else {
+          return res.json({
+            success: false,
+            error: "Không thể xóa bài đăng.",
+          });
+        }
+      } catch (error) {
+        console.error("Error: ", error);
         return res.json({
-          success: true,
-          status: "success",
-          message: "Xóa hoàn tất.",
+          success: false,
+          error: "Lỗi khi xóa bài đăng.",
         });
       }
     }
 
-    return res.json({ success: false });
+    return res.json({ success: false, error: "ID bài đăng không hợp lệ." });
   })
 );
 
@@ -274,5 +322,7 @@ router.post(
     }
   })
 );
+
+
 
 module.exports = router;

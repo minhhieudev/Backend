@@ -121,7 +121,7 @@ router.delete(
   $(async (req, res) => {
     const id = req.params.id;
     if (id) {
-      const result = await DetailTrainingPointNhapModel.deleteOne({ _id: id }).catch(
+      const result = await DetailTrainingPointNhapModel.deleteOne({ user: id }).catch(
         (error) => {
           console.error("Error: ", error);
           return null;

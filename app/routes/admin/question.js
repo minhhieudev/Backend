@@ -47,6 +47,49 @@ router.get(
   })
 );
 
+router.get(
+  "/paginated",
+  $(async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10;
+      const skip = (page - 1) * pageSize;
+
+      const total = await QuestionModel.countDocuments({});
+      const totalPages = Math.ceil(total / pageSize);
+
+      const questions = await QuestionModel.find({})
+        .populate({
+          path: "user",
+          select: "fullname avatarUrl",
+        })
+        .skip(skip)
+        .limit(pageSize)
+        .sort({ createdAt: -1 });
+
+      const pagination = {
+        total,
+        page,
+        pageSize,
+        totalPages,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: {
+          pagination,
+          questions,
+        },
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+      return res.status(500).json({
+        success: false,
+        error: "Không thể lấy bài đăng",
+      });
+    }
+  })
+);
 
 router.get(
   "/:id",

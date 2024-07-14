@@ -8,9 +8,6 @@ const schema = new mongoose.Schema({
     department: { type: String},
     dateOfBirth: { type: Date },
 
-    isComplete: { type: Boolean,default: false},
-
-
 });
 
 schema.set("timestamps", true);

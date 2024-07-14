@@ -6,7 +6,8 @@ const UserModel = db[modelName];
 const StudentModel = db["student"];
 const ConsultantModel = db["consultant"];
 const bcrypt = require("bcryptjs");
-
+const path = require("path");
+const fs = require("fs")
 // app.post(
 //   "/collection",
 //   $(async (req, res) => {
@@ -173,32 +174,51 @@ app.delete("/:id", $(async (req, res) => {
 
 
 app.post('/updateAvatarUser/:id', async (req, res) => {
-
   try {
     const userId = req.params.id;
     const newUrl = req.body.avatarUrl.newUrl; // Truy xuất giá trị avatarUrl trực tiếp từ client
 
-    // Kết hợp newUrl với /upload/
-
-    // Cập nhật avatarUrl trong MongoDB
-    const avatarUrl = await UserModel.findByIdAndUpdate(userId, { avatarUrl: newUrl }, { new: true });
-
-    if (!avatarUrl) {
+    // Tìm user theo ID và chờ kết quả
+    const user = await UserModel.findById(userId);
+    
+    if (!user) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy user.' });
     }
 
-    return res.json({ success: true, user: avatarUrl });
+    const oldUrl = user.avatarUrl;
+    console.log('User avatar URL:', oldUrl);
+
+    // Cập nhật avatarUrl trong MongoDB
+    user.avatarUrl = newUrl;
+    await user.save();
+
+    // Chỉ lấy phần sau "uploads/"
+    const relativePath = oldUrl.split('uploads/')[1];
+    const filePath = path.join(__dirname, '../../../public/uploads',relativePath);
+
+
+    // Xóa ảnh cũ nếu có
+    if (oldUrl && relativePath) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Lỗi khi xóa ảnh: ", err);
+        } else {
+          console.log('Ảnh cũ đã được xóa thành công');
+        }
+      });
+    }
+
+    return res.json({ success: true, user });
   } catch (error) {
     console.error('Lỗi khi cập nhật avatar:', error);
     return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
   }
 });
-
 app.post('/updateNotificationForUser/:id', async (req, res) => {
   try {
     const userId = req.params.id;
     const notificationList = req.body.notifications;
-    
+
 
     // Kiểm tra nếu notificationList không phải là một mảng thì trả về lỗi
     if (!Array.isArray(notificationList)) {
@@ -208,7 +228,7 @@ app.post('/updateNotificationForUser/:id', async (req, res) => {
     // Cập nhật mảng notifications của người dùng
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
-      { notifications:  notificationList},
+      { notifications: notificationList },
     );
 
     if (!updatedUser) {
@@ -245,7 +265,7 @@ app.get("/getNotification/:id", async (req, res) => {
 app.post('/addNotification/:id', async (req, res) => {
   try {
     const userId = req.params.id;
-console.log(userId)
+    console.log(userId)
 
     const newNotification = req.body.notification;
 
@@ -289,4 +309,41 @@ app.post("/updateNotificationStatus/:id", async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 });
+
+app.post('/changePassword/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { currentPassword, newPassword } = req.body.currentPassword;
+    console.log(req.body)
+
+    // Tìm user theo ID
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy user.' });
+    }
+
+    // Kiểm tra mật khẩu hiện tại
+    if (typeof currentPassword !== 'string' || typeof user.password !== 'string') {
+      return res.status(400).json({ success: false, message: 'Định dạng mật khẩu không hợp lệ.' });
+    }
+
+    const passwordIsValid = bcrypt.compareSync(currentPassword, user.password);
+    if (!passwordIsValid) {
+      return res.status(401).json({ success: false, message: 'Mật khẩu hiện tại không đúng.' });
+    }
+
+    // Mã hóa mật khẩu mới
+    user.password = newPassword;
+
+    // Lưu cập nhật vào MongoDB
+    await user.save();
+
+    return res.json({ success: true, message: 'Thay đổi mật khẩu thành công.' });
+  } catch (error) {
+    console.error('Lỗi khi thay đổi mật khẩu:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ.' });
+  }
+});
+
+
 module.exports = app;

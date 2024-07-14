@@ -55,6 +55,31 @@ router.get(
   })
 );
 
+router.post(
+  "/:id",
+  $(async (req, res) => {
+    try {
+      const replyId = req.params.id;
+
+      const updatedReply = await ReplyModel.findOneAndUpdate(
+        { _id: replyId },
+        { $inc: { likes: 1 } },
+        { new: true }
+      );
+
+      if (!updatedReply) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Câu trả lời không tồn tại." });
+      }
+
+      res.json(updatedReply);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json(err);
+    }
+  })
+);
 
 router.post(
   "/",
@@ -91,5 +116,22 @@ router.post(
     }
   })
 );
+
+router.delete("/deleteReply/:id", $(async (req, res) => {
+  const id = req.params.id
+  if (id) {
+    const result = await ReplyModel.deleteMany({ post: id }).catch(error => {
+      console.error('Error: ', error);
+      return null
+    })
+
+    if (result && result.deletedCount) {
+      return res.json({ success: true, status: 'success' })
+    }
+  }
+
+  return res.json({ success: false })
+}))
+
 
 module.exports = router;

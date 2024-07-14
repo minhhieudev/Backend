@@ -4,6 +4,8 @@ const detailTrainingPointNhapSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
   semester: String,
   schoolYear: String,
+  department: { type: String},
+  className: { type: String },
   status: { type: Boolean, default: false },
   criteriaList: [
     {

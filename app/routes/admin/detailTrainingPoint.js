@@ -76,11 +76,30 @@ router.get(
     }
   })
 );
+
 // Lấy danh sách điểm rèn luyện
-router.get(
-  "/",
+router.post(
+  "/getCondition",
   $(async (req, res) => {
     try {
+
+      const { schoolYear, semester, department, className } = req.body;
+
+      const matchConditions = {};
+
+      if (schoolYear) {
+        matchConditions["schoolYear"] = schoolYear;
+      }
+      if (semester) {
+        matchConditions["semester"] = String(semester);
+      }
+      if (department) {
+        matchConditions["department"] = department;
+      }
+      if (className) {
+        matchConditions["className"] = className;
+      }
+      console.log(matchConditions)
       const detailTrainingPoints = await DetailTrainingPointModel.aggregate([
         {
           $lookup: {
@@ -103,6 +122,9 @@ router.get(
         },
         {
           $unwind: "$studentDetails",
+        },
+        {
+          $match: matchConditions // Sử dụng các điều kiện chỉ khi chúng có giá trị
         },
         {
           $project: {
@@ -239,23 +261,38 @@ router.get("/:id", async (req, res) => {
 // }));
 
 // Lưu điểm rèn luyện mới
+// Lưu điểm rèn luyện mới hoặc cập nhật nếu đã tồn tại
 router.post(
   "/",
-  $(async (req, res) => {
+  async (req, res) => {
     try {
       const data = req.body;
-      if (data) {
-        // TODO: Thêm các bước kiểm tra và xác thực dữ liệu đầu vào nếu cần
+      if (data && data.user && data.schoolYear && data.semester) {
+        // Tìm và cập nhật hoặc tạo mới
+        const updatedDoc = await DetailTrainingPointModel.findOneAndUpdate(
+          {
+            user: data.user,
+            schoolYear: data.schoolYear,
+            semester: data.semester
+          }, // Điều kiện tìm kiếm
+          data, // Dữ liệu để cập nhật
+          { new: true, upsert: true, setDefaultsOnInsert: true } // Tùy chọn
+        );
 
-        const createdDetailTrainingPointModel = await DetailTrainingPointModel.create(data);
-
-        if (createdDetailTrainingPointModel) {
+        if (updatedDoc) {
           return res.status(201).json({
             success: true,
             status: 'success',
-            message: "Nộp phiếu điểm hành công.",
+            message: "Nộp phiếu điểm thành công.",
+            doc: updatedDoc
           });
         }
+      } else {
+        return res.status(400).json({
+          success: false,
+          status: 'error',
+          message: 'Vui lòng cung cấp dữ liệu, người dùng, năm học và học kỳ.',
+        });
       }
     } catch (error) {
       console.error("Error: ", error);
@@ -264,8 +301,9 @@ router.post(
         error: "Internal Server Error",
       });
     }
-  })
+  }
 );
+
 router.delete(
   "/:id",
   $(async (req, res) => {

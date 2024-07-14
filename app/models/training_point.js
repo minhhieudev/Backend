@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-  isShow: { type: Boolean, default: false },
+  //isShow: { type: Boolean, default: false },
   criteriaList: [
     {
       stt: String,

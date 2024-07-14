@@ -14,6 +14,7 @@ db.student = require("./student");
 db.consultant = require("./consultant");
 db.post = require("./post");
 db.notification = require("./notification");
+db.statistic = require("./statistic");
 
 
 

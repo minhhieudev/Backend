@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
   fullname: { type: String },
   email: { type: String, required: true },
-  avatarUrl: { type: String, default: '' }, 
+  avatarUrl: { type: String, default: `${process.env.VUE_APP_BACKEND_URL}/uploads/1713711775323-huhu.jpg` },
   password: { type: String, required: true },
   role: { type: String, default: 'student' },
   notifications: [
@@ -16,7 +17,6 @@ const userSchema = new mongoose.Schema({
       content: String,
       createdAt: { type: Date, default: Date.now },
       viewed: { type: Boolean, default: false },
-
     }
   ]
 });
@@ -36,6 +36,8 @@ userSchema.virtual("consultant", {
   foreignField: "email",
   justOne: true,
 });
+
+// Pre-save hook để mã hóa mật khẩu trước khi lưu
 
 const User = mongoose.model("user", userSchema);
 

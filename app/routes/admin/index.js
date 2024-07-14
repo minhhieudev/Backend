@@ -28,5 +28,6 @@ app.use("/consultant", require("./consultant"));
 app.use("/post", require("./post"));
 app.use("/notification", require("./notification"));
 app.use("/search", require("./search"));
+app.use("/statistic", require("./statistic"));
 
 module.exports = app;

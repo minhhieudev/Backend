@@ -38,6 +38,7 @@ app.post("/signin", async (req, res) => {
         user: {
           _id: admin._id,
           fullname: admin.fullname,
+          avatarUrl: admin.avatarUrl,
           email: admin.email,
           accessToken: token,
           role: admin.role,

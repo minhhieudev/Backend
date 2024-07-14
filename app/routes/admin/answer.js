@@ -101,4 +101,63 @@ router.post(
   })
 );
 
+router.post(
+  "/:id",
+  $(async (req, res) => {
+    try {
+      const answerId = req.params.id;
+
+      const updatedAnswer = await AnswerModel.findOneAndUpdate(
+        { _id: answerId },
+        { $inc: { likes: 1 } },
+        { new: true }
+      );
+
+      if (!updatedAnswer) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Câu trả lời không tồn tại." });
+      }
+
+      res.json(updatedAnswer);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json(err);
+    }
+  })
+);
+
+router.delete("/deleteAnswer/:id", $(async (req, res) => {
+  const id = req.params.id
+  console.log(id)
+  if (id) {
+    const result = await AnswerModel.deleteMany({ question: id }).catch(error => {
+      console.error('Error: ', error);
+      return null
+    })
+
+    if (result && result.deletedCount) {
+      return res.json({ success: true, status: 'success' })
+    }
+  }
+
+  return res.json({ success: false })
+}))
+
+router.delete("/deleteReply/:id", $(async (req, res) => {
+  const id = req.params.id
+  if (id) {
+    const result = await ReplyModel.deleteMany({ post: id }).catch(error => {
+      console.error('Error: ', error);
+      return null
+    })
+
+    if (result && result.deletedCount) {
+      return res.json({ success: true, status: 'success' })
+    }
+  }
+
+  return res.json({ success: false })
+}))
+
 module.exports = router;

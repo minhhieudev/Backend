@@ -22,14 +22,28 @@ const ResultTrainingPointModel = db[modelName];
 // );
 
 
-router.get(
-  "/",
-  $(async (req, res) => {
+router.post(
+  "/getCondition",
+  async (req, res) => {
     try {
+      const { schoolYear, department, className } = req.body;
+
+      const matchConditions = {};
+
+      if (schoolYear) {
+        matchConditions["schoolYear"] = schoolYear;
+      }
+      if (department) {
+        matchConditions["department"] = department;
+      }
+      if (className) {
+        matchConditions["className"] = className;
+      }
+
       const resultTrainingPoints = await ResultTrainingPointModel.aggregate([
         {
           $lookup: {
-            from: "users", // Tên của collection trong MongoDB (users hoặc tên tương ứng)
+            from: "users",
             localField: "user",
             foreignField: "_id",
             as: "userDetails",
@@ -40,7 +54,7 @@ router.get(
         },
         {
           $lookup: {
-            from: "students", // Tên của collection trong MongoDB (students hoặc tên tương ứng)
+            from: "students",
             localField: "userDetails.email",
             foreignField: "email",
             as: "studentDetails",
@@ -50,13 +64,16 @@ router.get(
           $unwind: "$studentDetails",
         },
         {
+          $match: matchConditions // Sử dụng các điều kiện chỉ khi chúng có giá trị
+        },
+        {
           $project: {
             _id: 1,
             semester1: 1,
             semester2: 1,
             schoolYear: 1,
             wholeYear: 1,
-            studentDetails: 1, // Thêm thông tin của student vào kết quả
+            studentDetails: 1,
           },
         },
       ]);
@@ -69,7 +86,7 @@ router.get(
         error: "Không thể lấy danh sách điểm rèn luyện.",
       });
     }
-  })
+  }
 );
 
 
@@ -112,7 +129,7 @@ router.post(
 
       await semester1Data.save();
 
-      return res.json({ success: true, message: "Cập nhật điểm kỳ 2 và cả năm thành công." });
+      return res.json({ success: true });
     } catch (error) {
       console.error("Error: ", error);
       return res.json({

@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
 const Schema = new mongoose.Schema({
+  department: { type: String},
+  className: { type: String },
   schoolYear: String,
   semester1: {
     point: String,

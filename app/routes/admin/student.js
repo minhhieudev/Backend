@@ -3,6 +3,7 @@ const router = express.Router();
 const $ = require("../../middlewares/safe-call");
 const modelName = "student";
 const StudentModel = db[modelName];
+const UserModel = db['user'];
 
 
 
@@ -17,9 +18,9 @@ router.get("/getStudentForClass", async (req, res) => {
       // Tìm tất cả sinh viên trong lớp hiện tại
       // Đảm bảo truy vấn đúng trường className, và loại bỏ _id và className
       const listStudents = await StudentModel.find()
-      .where('className').equals(className)
-      .select('-_id -className');
-  
+        .where('className').equals(className)
+        .select('-_id -className');
+
 
 
       // Trả về thông tin lớp và danh sách sinh viên
@@ -40,14 +41,23 @@ router.get("/getStudentForClass", async (req, res) => {
   }
 });
 
-router.get(
-  "/",
+router.post(
+  "/getCondition",
   $(async (req, res) => {
     try {
-      let filter = {};
+      const { department, className } = req.body;
+
+      const matchConditions = {};
+
+      if (department) {
+        matchConditions["department"] = department;
+      }
+      if (className) {
+        matchConditions["className"] = className;
+      }
 
 
-      const students = await StudentModel.find();
+      const students = await StudentModel.find(matchConditions);
 
       return res.json({ success: true, students });
     } catch (error) {
@@ -79,12 +89,12 @@ router.post(
     try {
       // Tìm tất cả sinh viên trong cơ sở dữ liệu
       const students = await StudentModel.find();
-      
+
       // Kiểm tra nếu không có sinh viên nào
       if (students.length === 0) {
         return res.json({ success: false, error: "Không tìm thấy sinh viên nào để cập nhật." });
       }
-      
+
       for (const student of students) {
         student.isComplete = false; // Đảo ngược giá trị của isComplete
         await student.save(); // Lưu lại thay đổi
@@ -101,7 +111,7 @@ router.post(
   "/updateIsCompleteId",
   async (req, res) => {
     try {
-      const {id} = req.query
+      const { id } = req.query
       const student = await StudentModel.findById(id);
 
       if (!student) {
@@ -111,7 +121,7 @@ router.post(
 
       await student.save();
 
-      return res.json({ success: true});
+      return res.json({ success: true });
     } catch (error) {
       console.error("Error: ", error);
       return res.json({ success: false });
@@ -244,6 +254,48 @@ router.get("/:id", $(async (req, res) => {
 //   })
 // );
 
+router.post(
+  "/saveStudents",
+  $(async (req, res) => {
+    try {
+      const studentsData = req.body.dataSV;
+      const usersData = req.body.user;
+      console.log(studentsData)
+
+      if (!Array.isArray(studentsData)) {
+        return res.json({
+          success: false,
+          error: "Dữ liệu không hợp lệ. Yêu cầu một mảng sinh viên.",
+        });
+      }
+      if (usersData) {
+
+        await UserModel.create(usersData)
+      }
+      // Lưu sinh viên vào cơ sở dữ liệu
+      const savedStudents = await StudentModel.create(studentsData);
+
+      if (savedStudents) {
+        return res.json({
+          success: true,
+          students: savedStudents,
+          message: "Lưu sinh viên thành công.",
+        });
+      } else {
+        return res.json({
+          success: false,
+          error: "Không thể lưu sinh viên.",
+        });
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+      return res.json({
+        success: false,
+        error: "Đã xảy ra lỗi khi lưu sinh viên.",
+      });
+    }
+  })
+);
 
 router.post("/", $(async (req, res) => {
   const data = req.body
